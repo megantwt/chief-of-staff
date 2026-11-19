@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chief of Staff · Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;background:#F9FAFB;color:#111827;font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:#0F766E}
+.wrap{max-width:1180px;margin:0 auto;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+h1{font-size:22px;margin:0;font-weight:600;letter-spacing:-.01em}
+h2{margin:0;font-size:13px;font-weight:600;color:#4B5563}
+h3{margin:0;font-size:16px;font-weight:600}
+.muted{color:#4B5563;font-size:12px}
+.btn{min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #D1D5DB;background:#fff;color:#111827;font-weight:500;font-size:13px}
+.btn.sm{min-height:32px;padding:0 10px;font-size:12px;border-radius:8px}
+.btn.pri{background:#0F766E;border-color:#0F766E;color:#fff}
+.btn.danger{color:#991B1B}
+.btn:disabled{opacity:.55;cursor:default}
+.mode{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.mode .pill{font-size:11px}
+.linkbtn{border:none;background:none;color:#0F766E;font-size:12px;font-weight:500;padding:0;text-decoration:underline;min-height:24px}
+.nav{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid #E5E7EB;margin-bottom:12px;scrollbar-width:none}
+.nav a{white-space:nowrap;text-decoration:none;color:#4B5563;font-weight:500;padding:10px 12px;border-bottom:2px solid transparent;min-height:44px;display:flex;align-items:center}
+.nav a.on{color:#0F766E;border-color:#0F766E}
+.err{background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px}
+.note{font-size:12px;color:#4B5563;background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:8px 10px;margin:0 0 12px}
+/* gate */
+.gate{max-width:560px;margin:24px auto;display:flex;flex-direction:column;gap:14px}
+.gate .card{gap:12px;padding:18px}
+.gate ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:#374151}
+.choice{display:flex;flex-direction:column;gap:8px}
+.choice .btn{min-height:48px;font-size:14px}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+/* tour */
+.tour{background:#F0FDFA;border:1px solid #99F6E4;border-radius:14px;padding:10px 12px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.tour ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.tour li{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#134E4A;padding:4px 0}
+.tour li.next{background:#fff;border:1px solid #99F6E4;border-radius:10px;padding:6px 8px}
+.tour li.ok .tt{color:#4B7A73}
+.tour .tt{flex:1;min-width:0}
+.tour .go{min-height:30px;padding:0 10px;border-radius:8px;border:1px solid #0F766E;background:#0F766E;color:#fff;font-size:12px;font-weight:500;flex-shrink:0}
+.tick{width:20px;height:20px;border-radius:999px;border:1.5px solid #0F766E;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#0F766E;margin-top:1px}
+.tick.ok{background:#0F766E;color:#fff}
+.tourhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bar{height:6px;background:#CCFBF1;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:#0F766E}
+/* home */
+.card{background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.qa{border:1px solid #E5E7EB;background:#fff;border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.qa-row{display:flex;gap:6px}
+.qa-row input{flex:1;min-width:0;height:44px;border:1px solid #D1D5DB;border-radius:12px;padding:0 12px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{min-height:32px;padding:0 10px;border-radius:999px;border:1px solid #D1D5DB;background:#fff;font-size:12px;color:#374151}
+.chip.on{background:#0F766E;border-color:#0F766E;color:#fff}
+.photo{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:6px}
+.photo input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.qcard{border:1px solid #99F6E4;background:#F0FDFA;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.by{font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;align-self:flex-start}
+.by.ai{background:#EDE9FE;color:#4C1D95}.by.rules{background:#F3F4F6;color:#374151}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.f{display:flex;flex-direction:column;gap:3px}
+.f label{font-size:11px;font-weight:600;color:#115E59}
+.ctl{height:40px;border:1px solid #99F6E4;border-radius:8px;padding:0 8px;background:#fff;width:100%;min-width:0;color:#134E4A}
+.check{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#134E4A}
+.check input{width:18px;height:18px;accent-color:#0F766E;margin:0;flex-shrink:0}
+.tabs{display:flex;gap:4px;padding:4px;background:#F3F4F6;border-radius:12px;margin-bottom:12px}
+.tab{flex:1;min-height:38px;border:none;border-radius:9px;background:transparent;color:#4B5563;font-weight:500}
+.tab.on{background:#fff;color:#111827;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.cols{display:flex;flex-direction:column;gap:12px}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+section[data-tab]{display:none}
+body[data-tab="today"] section[data-tab~="today"],body[data-tab="todo"] section[data-tab~="todo"],body[data-tab="projects"] section[data-tab~="projects"],body[data-tab="ideas"] section[data-tab~="ideas"]{display:flex}
+@media (min-width:900px){
+  .tabs{display:none}
+  .cols{flex-direction:row;align-items:flex-start}
+  .col.left{flex:0 0 380px}.col.right{flex:1}
+  section[data-tab]{display:flex!important}
+}
+.pill{font-size:11px;font-weight:600;border-radius:999px;padding:2px 7px;flex-shrink:0}
+.red{background:#FEE2E2;color:#991B1B}.amber{background:#FEF3C7;color:#78350F}.grey{background:#F3F4F6;color:#374151}.teal{background:#CCFBF1;color:#115E59}.blue{background:#DBEAFE;color:#1E3A8A}.violet{background:#EDE9FE;color:#4C1D95}
+.row{display:flex;align-items:center;gap:10px;min-height:48px;border-top:1px solid #F3F4F6}
+.row .t{flex:1;min-width:0}
+.row input[type=checkbox]{width:20px;height:20px;accent-color:#0F766E;margin:0;flex-shrink:0}
+.icon{width:36px;height:36px;flex-shrink:0;border-radius:10px;border:1px solid #D1D5DB;background:#fff;display:flex;align-items:center;justify-content:center}
+.panel{display:flex;flex-direction:column;gap:8px;padding:2px 0 12px 30px}
+.line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+input[type=range]{accent-color:#0F766E;flex:1;min-width:120px}
+.datein{height:34px;border:1px solid #D1D5DB;border-radius:8px;padding:0 6px;font-size:12px}
+.prop{border:1px solid #E5E7EB;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:4px}
+.cal{position:relative;margin:4px 0 0 38px}
+.hr{position:absolute;left:0;right:0;border-top:1px solid #F3F4F6}
+.hr span{position:absolute;left:-38px;top:-7px;width:32px;text-align:right;font-size:10px;color:#6B7280}
+.ev{position:absolute;box-sizing:border-box;padding:1px 6px;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;justify-content:center;font-size:11px;line-height:1.2}
+.ev b{font-weight:600}
+.ev.base{background:#CCFBF1;border-left:3px solid #0F766E;color:#134E4A;cursor:pointer}
+.ev.warn{background:#FEF3C7;border-left:3px solid #B45309;color:#78350F;cursor:pointer}
+.ev.free{background:#ECFDF5;border:1px dashed #059669;color:#065F46}
+.ev.sel{outline:2px solid #111827}
+.allday{font-size:12px;background:#DBEAFE;color:#1E3A8A;border-radius:6px;padding:4px 8px;border:none;text-align:left;width:100%;cursor:pointer}
+.edit{border:1px solid #D1D5DB;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;background:#F9FAFB}
+.seg{display:flex;gap:4px}
+.ideas{background:#FFFBEB;border-color:#FDE68A}
+.ideas h2{color:#78350F}
+.bumped{background:#F3F4F6;border:1px dashed #9CA3AF}
+.undo{display:flex;align-items:center;gap:8px;font-size:13px;background:#111827;color:#fff;border-radius:10px;padding:8px 12px;position:fixed;left:50%;transform:translateX(-50%);bottom:16px;z-index:5;max-width:92vw}
+.undo button{background:transparent;border:1px solid #6B7280;color:#5EEAD4;border-radius:6px;min-height:30px;padding:0 10px;font-weight:600}
+.empty{font-size:13px;color:#6B7280;padding:6px 0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* briefs */
+.briefwrap{display:flex;flex-direction:column;gap:12px;max-width:460px}
+.notif{display:flex;gap:10px;align-items:flex-start;background:#E5E7EB;border-radius:16px;padding:10px 12px;font-size:13px}
+.notif .app{width:30px;height:30px;border-radius:8px;background:#D97757;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.chat{background:#fff;border:1px solid #E5E7EB;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.chathead{display:flex;justify-content:space-between;font-size:12px;color:#6B7280;border-bottom:1px solid #F3F4F6;padding-bottom:8px}
+.msg{display:flex;flex-direction:column;gap:8px;font-size:14px}
+.msg p{margin:0}
+.bh{font-weight:600;font-size:14px;margin-top:4px}
+.msg ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.dsvg{display:block}
+.dsvg .ts{font-size:11px;font-family:Inter,system-ui,sans-serif}
+.dsvg .th{font-size:12px;font-weight:600;font-family:Inter,system-ui,sans-serif}
+.quote{border-left:3px solid #D1D5DB;padding:2px 0 2px 10px;color:#374151;font-style:italic}
+.thumbs{display:flex;gap:6px;align-items:center}
+.thumbs button{min-height:34px;min-width:44px;border-radius:999px;border:1px solid #D1D5DB;background:#fff}
+.thumbs button.on{background:#0F766E;border-color:#0F766E;color:#fff}
+/* about */
+.prose{max-width:760px;display:flex;flex-direction:column;gap:14px}
+.prose p{margin:0}
+.flowrow{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.flowrow .lbl{font-size:12px;font-weight:600;color:#4B5563;padding-top:10px}
+.boxes{display:flex;flex-wrap:wrap;gap:6px}
+.box{flex:1 1 150px;border-radius:10px;padding:8px 10px;font-size:13px;border:1px solid}
+.box b{display:block;font-weight:600}
+.b-you{background:#F5F3FF;border-color:#DDD6FE;color:#4C1D95}
+.b-store{background:#EFF6FF;border-color:#BFDBFE;color:#1E3A8A}
+.b-run{background:#F0FDFA;border-color:#99F6E4;color:#134E4A}
+.b-back{background:#FFFBEB;border-color:#FDE68A;color:#78350F}
+.arrow{text-align:center;color:#9CA3AF;font-size:14px;line-height:1}
+@media (max-width:600px){.flowrow{grid-template-columns:1fr}.flowrow .lbl{padding-top:0}.arrow{display:none}}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.cbox{background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:10px 12px;font-size:13px}
+.cbox b{display:block;margin-bottom:2px}
+</style>
+</head>
+<body data-tab="today">
+<div class="wrap" id="app"></div>
+<script>
+// ======================================================================
+// CONFIG: filled in by the chief-of-staff skill when it builds your copy.
+// Left empty, this page runs on a sample week only.
+// ======================================================================
+const CONFIG = /*COS_CONFIG*/{
+  "owner": "",
+  "tz": "",
+  "tasksDataSourceId": "",
+  "tasksView": "",
+  "proposalsView": "",
+  "calendars": [],
+  "repo": "https://github.com/megantwt/chief-of-staff"
+}/*END_COS_CONFIG*/;
+const LINKED = !!(CONFIG.tasksDataSourceId && CONFIG.tasksView && CONFIG.calendars && CONFIG.calendars.length);
+const ZIP = CONFIG.repo + "/raw/main/chief-of-staff-skill.zip";
+
+// ================= dates & helpers =================
+const TZ = CONFIG.tz || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+const pad = (n) => String(n).padStart(2, "0");
+const ymd = (d) => new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+const TODAY = () => ymd(new Date());
+const addDays = (iso, n) => { const t = new Date(iso + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+const diff = (iso) => Math.round((new Date(iso.slice(0, 10) + "T12:00:00Z") - new Date(TODAY() + "T12:00:00Z")) / 864e5);
+const fmtD = (iso, o) => new Date(iso.slice(0, 10) + "T12:00:00Z").toLocaleDateString("en-US", Object.assign({ timeZone: "UTC" }, o));
+const nice = (iso) => iso ? fmtD(iso, { weekday: "short", month: "short", day: "numeric" }) : "";
+const short = (iso) => iso ? fmtD(iso, { month: "short", day: "numeric" }) : "";
+const dowName = (iso) => fmtD(iso, { weekday: "long" });
+const minsIn = (dt) => { const p = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(dt)).split(":"); return Number(p[0]) * 60 + Number(p[1]); };
+const fm = (m) => Math.floor(m / 60) + ":" + pad(m % 60);
+const hm = (s) => Number(s.slice(0, 2)) * 60 + Number(s.slice(3, 5));
+const toHM = (m) => pad(Math.floor(m / 60)) + ":" + pad(m % 60);
+const dur = (m) => ((m >= 60 ? Math.floor(m / 60) + "h" : "") + (m % 60 ? " " + (m % 60) + "m" : "")).trim();
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let uid = Date.now() % 100000;
+const nid = () => "x" + (uid++);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+
+const KINDS = [
+  { k: "classes", n: "Classes" }, { k: "deadlines", n: "Deadlines" }, { k: "exam", n: "Exams & interviews" },
+  { k: "social", n: "Social" }, { k: "exercise", n: "Exercise" }, { k: "work", n: "Work & study" }, { k: "bday", n: "Birthdays" }
+];
+const QUOTES = [
+  ["Well begun is half done.", "Aristotle"],
+  ["It always seems impossible until it's done.", "Nelson Mandela"],
+  ["You don't have to see the whole staircase, just take the first step.", "Martin Luther King Jr."],
+  ["The secret of getting ahead is getting started.", "Attributed to Mark Twain"],
+  ["Nothing will work unless you do.", "Maya Angelou"],
+  ["Little by little, one travels far.", "J.R.R. Tolkien"],
+  ["Energy and persistence conquer all things.", "Benjamin Franklin"],
+  ["Do what you can, with what you have, where you are.", "Theodore Roosevelt"]
+];
+
+// ================= state =================
+// S holds what's on screen in either mode. Items/props/events have the same shape in both.
+const S = { mode: null, items: [], props: [], events: [], cals: [], loading: false, synced: null, err: "", errSample: false,
+  view: "home", tab: "today", day: 0, brief: "pm", open: null, evOpen: null, bumpedOpen: false, laterOpen: false, undo: null, busy: {},
+  tourOpen: true, gateInfo: null,
+  qa: { text: "", force: "", card: null, queue: [], by: "", busy: "", note: "" } };
+let mcp = null, sampler = null, canImg = false, mcpChecked = false;
+const calByKey = (k) => S.cals.find((c) => c.k === k) || S.cals.find((c) => c.k === "work") || S.cals[0];
+const calById = (id) => S.cals.find((c) => c.id === id);
+const owner = () => S.mode === "sample" ? "Sam" : (CONFIG.owner || "");
+
+// ================= sample mode =================
+const SKEY = "cos-sample-v1";
+let SD = null; // persisted sample data
+function sampleWeek() {
+  const T = TODAY(), dd = (n) => addDays(T, n);
+  const E = (d, a, b, t, k, id) => ({ id: id || nid(), calId: k, day: dd(d), a: hm(a), b: hm(b), t, mine: true, guests: 0 });
+  const A = (d, t, k) => ({ id: nid(), calId: k, day: dd(d), allDay: true, t, mine: true, guests: 0 });
+  const I = (title, type, o) => Object.assign({ id: nid(), title, type, due: null, show: null, pct: null }, o || {});
+  return {
+    anchor: T,
+    events: [
+      E(0, "08:00", "09:00", "Gym", "exercise"), E(0, "10:30", "12:00", "Contracts", "classes"), E(0, "12:15", "13:15", "Lunch with Priya", "social"),
+      E(0, "13:30", "15:00", "Tech Policy seminar", "classes"), E(0, "14:30", "15:30", "TA office hours", "work", "oh"), E(0, "16:00", "17:00", "Study group", "work"),
+      E(0, "19:30", "21:00", "Dinner with friends", "social"),
+      E(1, "09:00", "10:30", "Statistics", "classes"), E(1, "11:00", "12:00", "Career advising call", "work"), E(1, "14:00", "15:00", "Interview: Policy Fellowship", "exam"),
+      E(1, "15:30", "17:00", "Contracts", "classes"), E(1, "18:00", "19:00", "Run along the river", "exercise"),
+      E(2, "10:00", "11:30", "Tech Policy seminar", "classes"), E(2, "20:00", "22:00", "Jordan's birthday drinks", "social"),
+      A(5, "Seminar paper outline due", "deadlines"), E(9, "09:00", "12:00", "Statistics final exam", "exam"), A(12, "Problem set 6 due", "deadlines")
+    ],
+    items: [
+      I("Read Contracts ch. 7", "To-do", { due: dd(0) }), I("Problem set 5", "To-do", { due: dd(1) }), I("Email Prof. Lee about the RA role", "To-do"),
+      I("Plan for Statistics final exam", "To-do", { due: dd(8), pct: 20 }), I("Book flights home for winter break", "To-do", { show: dd(6) }),
+      I("Renew library books", "To-do", { show: dd(3) }), I("Seminar paper", "Project", { due: dd(25), pct: 35 }), I("Personal website", "Project", { pct: 10 }),
+      I("Learn SQL", "Project", { show: dd(14) }), I("Start a podcast on tech policy", "Idea"), I("Run a half marathon in the spring", "Idea"),
+      I("Write an op-ed on AI in courts", "Idea", { show: dd(10) })
+    ],
+    props: [
+      { id: "pr1", kind: "Approval", title: "Office hours clash with your seminar", date: dd(0),
+        detail: "TA office hours (14:30–15:30) overlaps the Tech Policy seminar (13:30–15:00) today. Move office hours to 15:00–16:00? That slot is free.",
+        action: { op: "update", calendarId: "work", eventId: "oh", startTime: dd(0) + "T15:00:00", endTime: dd(0) + "T16:00:00" } },
+      { id: "pr2", kind: "Approval", title: "No prep time before tomorrow's interview", date: dd(1),
+        detail: "Your Policy Fellowship interview is tomorrow at 14:00. Add “Interview prep” from 12:15 to 13:15 tomorrow? That slot is free.",
+        action: { op: "create", calendarId: "work", summary: "Interview prep", startTime: dd(1) + "T12:15:00", endTime: dd(1) + "T13:15:00" } },
+      { id: "pr3", kind: "Heads-up", title: "Problem set 5 is due tomorrow", date: dd(0), detail: "Tomorrow is packed. Today 17:00–19:30 is free if you want to finish it tonight." }
+    ],
+    qi: 0, thumb: null,
+    tour: { brief: false, task: false, event: false, approve: false, bump: false, progress: false, again: false, photo: false, eventDay: 1 }
+  };
+}
+function loadSample(fresh) {
+  if (!fresh) { try { const v = JSON.parse(store.get(SKEY) || "null"); if (v && v.anchor === TODAY()) SD = v; } catch (e) { SD = null; } }
+  if (!SD || fresh) SD = sampleWeek();
+  S.items = SD.items; S.props = SD.props; S.events = SD.events;
+  S.cals = KINDS.map((k) => ({ k: k.k, id: k.k, n: k.n }));
+}
+const saveSample = () => { if (S.mode === "sample" && SD) { SD.items = S.items; SD.props = S.props; SD.events = S.events; store.set(SKEY, JSON.stringify(SD)); } };
+const tour = () => (S.mode === "sample" && SD ? SD.tour : null);
+function mark(k) { const t = tour(); if (t && k) t[k] = true; saveSample(); }
+function sawBrief() { const t = tour(); if (t) { t.brief = true; if (t.task || t.event) t.again = true; saveSample(); } }
+
+// ================= live mode (your Google Calendar + Notion) =================
+function unwrap(r) {
+  let p = r && r.payload !== undefined ? r.payload : r;
+  if (p && p.structuredContent) p = p.structuredContent;
+  if (p && Array.isArray(p.content)) { const t = p.content.filter((c) => c.type === "text").map((c) => c.text).join(""); try { return JSON.parse(t); } catch (e) { return t; } }
+  if (typeof p === "string") { try { return JSON.parse(p); } catch (e) { return p; } }
+  return p;
+}
+const call = async (server, tool, input) => unwrap(await mcp.callTool(server, tool, input));
+async function viewRows(view) {
+  let out = [], cursor = null;
+  for (let i = 0; i < 10; i++) {
+    const data = { mode: "view", view_url: view, page_size: 100 }; if (cursor) data.start_cursor = cursor;
+    const r = await call("Notion", "notion-query-data-sources", { data });
+    out = out.concat((r && r.results) || []);
+    if (!r || !r.has_more || !r.next_cursor) break; cursor = r.next_cursor;
+  }
+  return out;
+}
+const pageId = (url) => String(url).split("/").pop().split("?")[0].replace(/-/g, "").slice(-32);
+const LIVE = {
+  async load() {
+    const t = TODAY(), end = addDays(t, 15);
+    const [tasks, props] = await Promise.all([viewRows(CONFIG.tasksView), CONFIG.proposalsView ? viewRows(CONFIG.proposalsView) : Promise.resolve([])]);
+    S.items = tasks.filter((r) => r.Status !== "Done").map((r) => ({ id: r.url, title: r.Task || "(untitled)", type: r.Type || "To-do", due: r["date:Due:start"] || null, show: r["date:Show from:start"] || null, pct: r["Progress %"] ?? null }));
+    S.props = props.filter((r) => r.Status === "Pending").map((r) => { let a = null; try { a = r.Action ? JSON.parse(r.Action) : null; } catch (e) { a = null; } return { id: r.url, title: r.Title, kind: r.Kind, detail: r.Detail, action: a, date: r["date:For date:start"] }; });
+    const lists = await Promise.all(S.cals.map((c) => call("Google Calendar", "list_events", { calendarId: c.id, startTime: t + "T00:00:00", endTime: end + "T00:00:00", orderBy: "startTime", pageSize: 250 }).catch(() => ({ events: [] }))));
+    const evs = [];
+    lists.forEach((l, i) => ((l && l.events) || []).forEach((e) => {
+      if (e.status === "cancelled" || e.transparency === "transparent") return;
+      const c = S.cals[i], mine = !e.organizer || !!e.organizer.self || e.organizer.email === c.id, guests = (e.attendees || []).filter((x) => !x.self).length;
+      const base = { id: e.id, calId: c.id, t: e.summary || "(no title)", mine, guests, recurring: !!e.recurringEventId };
+      if (e.start && e.start.date) { for (let d = e.start.date; d < e.end.date && d < end; d = addDays(d, 1)) if (d >= t) evs.push(Object.assign({}, base, { day: d, allDay: true })); return; }
+      if (!e.start || !e.start.dateTime) return;
+      const a = minsIn(e.start.dateTime), b = Math.max(minsIn(e.end.dateTime), a + 15);
+      evs.push(Object.assign(base, { day: ymd(new Date(e.start.dateTime)), a, b: ymd(new Date(e.end.dateTime)) !== ymd(new Date(e.start.dateTime)) ? 1439 : b }));
+    }));
+    S.events = evs;
+  },
+  updateItem: (id, properties) => call("Notion", "notion-update-page", { page_id: id, command: "update_properties", properties }),
+  createItem: (properties) => call("Notion", "notion-create-pages", { parent: { data_source_id: CONFIG.tasksDataSourceId }, pages: [{ properties }] }),
+  deleteItem: (id) => call("Notion", "notion-delete-pages", { page_ids: [pageId(id)], user_confirmed: true }),
+  setProp: (id, status) => call("Notion", "notion-update-page", { page_id: id, command: "update_properties", properties: { Status: status } }),
+  createEvent: (calId, summary, startTime, endTime, allDay) => call("Google Calendar", "create_event", { calendarId: calId, summary, startTime, endTime, allDay: !!allDay }),
+  updateEvent: (calId, eventId, startTime, endTime) => call("Google Calendar", "update_event", { calendarId: calId, eventId, startTime, endTime }),
+  deleteEvent: (calId, eventId) => call("Google Calendar", "delete_event", { calendarId: calId, eventId })
+};
+// The sample adapter changes the in-page week, so every action below works the same way in both modes.
+const SAMPLE = {
+  async load() {},
+  async updateItem(id, p) { const i = S.items.find((x) => x.id === id); if (!i) return;
+    if ("Status" in p && p.Status === "Done") i.done = true; if ("Status" in p && p.Status === "To do") i.done = false;
+    if ("Progress %" in p) i.pct = p["Progress %"]; if ("date:Show from:start" in p) i.show = p["date:Show from:start"]; if ("Type" in p) i.type = p.Type; saveSample(); },
+  async createItem(p) { S.items.push({ id: nid(), title: p.Task, type: p.Type, due: p["date:Due:start"] || null, show: p["date:Show from:start"] || null, pct: null }); saveSample(); },
+  async deleteItem(id) { const ix = S.items.findIndex((x) => x.id === id); if (ix >= 0) S.items.splice(ix, 1); saveSample(); },
+  async setProp(id) { const ix = S.props.findIndex((x) => x.id === id); if (ix >= 0) S.props.splice(ix, 1); saveSample(); },
+  async createEvent(calId, t, st, en, allDay) { S.events.push(allDay ? { id: nid(), calId, day: st.slice(0, 10), allDay: true, t, mine: true, guests: 0 } : { id: nid(), calId, day: st.slice(0, 10), a: hm(st.slice(11, 16)), b: en.slice(0, 10) > st.slice(0, 10) ? 1439 : hm(en.slice(11, 16)), t, mine: true, guests: 0 }); saveSample(); },
+  async updateEvent(calId, id, st, en) { const e = S.events.find((x) => x.id === id); if (e) { e.a = hm(st.slice(11, 16)); e.b = hm(en.slice(11, 16)); } saveSample(); },
+  async deleteEvent(calId, id) { const ix = S.events.findIndex((x) => x.id === id); if (ix >= 0) S.events.splice(ix, 1); saveSample(); }
+};
+const api = () => S.mode === "live" ? LIVE : SAMPLE;
+
+async function load() {
+  if (S.mode !== "live") { render(); return; }
+  S.loading = true; S.err = ""; render();
+  try { await LIVE.load(); S.synced = new Date(); }
+  catch (e) {
+    const code = e && (e.code || ""); const msg = (e && (e.message || e.code)) || String(e);
+    S.err = /denied|not_granted|authz|consent|permission/i.test(code + " " + msg) ? "You didn't give this page access to your Google Calendar and Notion, so it can't show your things." : "Couldn't read your Notion or Google Calendar: " + msg;
+    S.errSample = true;
+  }
+  S.loading = false; render();
+}
+async function guarded(fn, okMsg) {
+  try { await fn(); if (okMsg) toast(okMsg); }
+  catch (e) { S.err = "That didn't save: " + ((e && (e.message || e.code)) || e) + ". Reloading."; render(); load(); }
+}
+
+// ================= mode switching =================
+function chooseMode(m) {
+  if (m === "sample") { S.mode = "sample"; store.set("cos-mode", "sample"); loadSample(false); S.err = ""; S.errSample = false; S.gateInfo = null; go("home"); return; }
+  // live
+  if (!LINKED) { S.gateInfo = "unlinked"; render(); return; }
+  if (!mcpChecked) { S.gateInfo = "checking"; render(); setTimeout(() => chooseMode("live"), 600); return; }
+  if (!mcp) { S.gateInfo = "nomcp"; render(); return; }
+  S.mode = "live"; store.set("cos-mode", "live"); S.cals = CONFIG.calendars.slice(); S.gateInfo = null; S.items = []; S.props = []; S.events = [];
+  go("home"); load();
+}
+
+// ================= calendar helpers =================
+const dayIso = (off) => addDays(TODAY(), off);
+const timed = (iso) => S.events.filter((e) => e.day === iso && !e.allDay && !e.hidden).map((e) => Object.assign({}, e)).sort((x, y) => x.a - y.a || x.b - y.b);
+const allday = (iso) => S.events.filter((e) => e.day === iso && e.allDay && !e.hidden);
+function freeGaps(ev, from = 480, to = 1320) {
+  const busy = []; ev.forEach((e) => { const l = busy[busy.length - 1]; if (l && e.a <= l[1]) l[1] = Math.max(l[1], e.b); else busy.push([e.a, e.b]); });
+  const gaps = []; let c = from;
+  busy.forEach(([a, b]) => { if (Math.min(a, to) - c >= 30) gaps.push([c, Math.min(a, to)]); c = Math.max(c, b); });
+  if (to - c >= 30) gaps.push([c, to]);
+  return gaps;
+}
+const longestGap = (g) => g.slice().sort((x, y) => (y[1] - y[0]) - (x[1] - x[0]))[0];
+const clashes = (ev) => ev.map((e, i) => ev.some((o, j) => j !== i && o.a < e.b && e.a < o.b));
+const calName = (id) => (calById(id) || { n: "" }).n;
+const calKind = (id) => (calById(id) || { k: "" }).k;
+
+// The same to-scale drawing the real briefs send in chat (one hour per row).
+function calSVG(iso, title) {
+  const ev = timed(iso), ad = allday(iso).map((e) => e.t);
+  let D0 = 480, D1 = 1320;
+  ev.forEach((e) => { D0 = Math.min(D0, Math.floor(e.a / 60) * 60); D1 = Math.max(D1, Math.ceil(e.b / 60) * 60); });
+  const HP = 36, X0 = 50, X1 = 372, top = ad.length ? 44 : 14, y = (t) => top + (t - D0) / 60 * HP, H = Math.round(y(D1)) + 14;
+  let o = `<svg class="dsvg" viewBox="0 0 380 ${H}" width="100%" role="img" aria-label="${esc(title)}">`;
+  if (ad.length) { const txt = "All day: " + ad.join(", ");
+    o += `<rect x="${X0}" y="8" width="${X1 - X0}" height="26" rx="4" fill="#DBEAFE" stroke="#1E3A8A" stroke-width=".5"/><text class="ts" x="${X0 + 10}" y="21" fill="#1E3A8A" dominant-baseline="central">${esc(txt.length > 50 ? txt.slice(0, 49) + "…" : txt)}</text>`; }
+  for (let t = D0; t <= D1; t += 60) o += `<line x1="${X0}" x2="${X1}" y1="${y(t)}" y2="${y(t)}" stroke="#E5E7EB" stroke-width=".6"/><text class="ts" x="4" y="${y(t)}" fill="#6B7280" dominant-baseline="central">${fm(t)}</text>`;
+  freeGaps(ev).forEach(([a, b]) => { const h = y(b) - y(a) - 2;
+    o += `<rect x="${X0 + 2}" y="${y(a) + 1}" width="${X1 - X0 - 4}" height="${h}" rx="4" fill="#ECFDF5" stroke="#059669" stroke-width=".7" stroke-dasharray="4 3"/>`;
+    if (h >= 20) o += `<text class="ts" x="${X0 + 12}" y="${y(a) + 13}" fill="#065F46" dominant-baseline="central">Free ${fm(a)}–${fm(b)} · ${dur(b - a)}</text>`; });
+  const cl = clashes(ev);
+  ev.forEach((e, i) => {
+    const col = cl[i] ? (ev.slice(0, i).some((o2, j) => cl[j] && o2.a < e.b && e.a < o2.b) ? 1 : 0) : 0;
+    const w = cl[i] ? (X1 - X0 - 4) / 2 - 2 : X1 - X0 - 4, x = X0 + 2 + col * ((X1 - X0 - 4) / 2 + 2), h = Math.max(y(e.b) - y(e.a) - 2, 16);
+    const [fill, st, tx] = cl[i] ? ["#FEF3C7", "#B45309", "#78350F"] : ["#CCFBF1", "#0F766E", "#134E4A"];
+    const maxc = cl[i] ? 20 : 40, t = e.t.length <= maxc ? e.t : e.t.slice(0, maxc - 1) + "…";
+    o += `<rect x="${x}" y="${y(e.a) + 1}" width="${w}" height="${h}" rx="4" fill="${fill}" stroke="${st}" stroke-width=".7"/>`;
+    if (h >= 34) o += `<text class="th" x="${x + 10}" y="${y(e.a) + 13}" fill="${tx}" dominant-baseline="central">${esc(t)}</text><text class="ts" x="${x + 10}" y="${y(e.a) + 29}" fill="${tx}" dominant-baseline="central">${fm(e.a)}–${fm(e.b)}${cl[i] ? " · clash" : ""}</text>`;
+    else o += `<text class="ts" x="${x + 10}" y="${y(e.a) + 1 + h / 2}" fill="${tx}" dominant-baseline="central">${esc(t)} · ${fm(e.a)}–${fm(e.b)}</text>`;
+  });
+  return o + "</svg>";
+}
+
+// ================= items =================
+const visibleOn = (i, iso) => !i.done && !i.hidden && (!i.show || i.show.slice(0, 10) <= iso);
+const bumpedNow = (i) => !i.done && !i.hidden && i.show && i.show.slice(0, 10) > TODAY();
+const byDue = (a, b) => (a.due || "9999") < (b.due || "9999") ? -1 : (a.due || "9999") > (b.due || "9999") ? 1 : 0;
+function dueLbl(iso, base = 0) {
+  if (!iso) return ["No date", "grey"];
+  const d = diff(iso) - base;
+  if (d < 0) return [base === 1 ? "Was due today" : "Overdue", "red"];
+  if (d === 0) return [base === 1 ? "Due tomorrow" : "Today", "red"];
+  if (d <= 3 && base === 0) return [d === 1 ? "Tomorrow" : "In " + d + " days", "amber"];
+  return [short(iso), "grey"];
+}
+
+// ================= briefs (preview of what the scheduled chats send) =================
+function briefPM() {
+  const t1 = dayIso(1), ev = timed(t1), first = ev[0], g = freeGaps(ev), lg = longestGap(g), cl = clashes(ev).some(Boolean);
+  const shape = ev.length >= 5 ? "a full day" : ev.length >= 3 ? "a steady day" : ev.length ? "a light day" : "an open day";
+  const todos = S.items.filter((i) => i.type === "To-do" && visibleOn(i, t1)).sort(byDue);
+  const projs = S.items.filter((i) => i.type === "Project" && visibleOn(i, t1)).sort(byDue);
+  const t2 = dayIso(2), t14 = dayIso(14);
+  const horizon = S.events.filter((e) => e.day >= t2 && e.day <= t14 && ["exam", "deadlines"].includes(calKind(e.calId))).map((e) => ({ d: e.day, t: e.t }))
+    .concat(S.items.filter((i) => !i.done && i.due && i.due.slice(0, 10) >= t2 && i.due.slice(0, 10) <= t14 && i.type !== "Idea").map((i) => ({ d: i.due.slice(0, 10), t: i.title + " (due)" })))
+    .sort((a, b) => a.d < b.d ? -1 : 1);
+  const appr = S.props.filter((p) => p.kind === "Approval"), heads = S.props.filter((p) => p.kind !== "Approval");
+  const qi = SD && S.mode === "sample" ? SD.qi : new Date().getDate(), q = QUOTES[qi % QUOTES.length], thumb = S.mode === "sample" && SD ? SD.thumb : S.thumb;
+  const who = owner() ? ", " + esc(owner()) : "";
+  return { time: "8:00 PM", notif: `Tomorrow: ${ev.length} event${ev.length === 1 ? "" : "s"}${first ? ", first " + first.t + " at " + fm(first.a) : ""}.${appr.length ? " " + appr.length + " thing" + (appr.length > 1 ? "s need" : " needs") + " your OK." : ""}`, html: `
+    <div class="msg"><p><b>Good evening${who}.</b> Tomorrow (${dowName(t1)}) is ${shape}: ${ev.length} event${ev.length === 1 ? "" : "s"}${first ? `, starting with ${esc(first.t)} at ${fm(first.a)}` : ""}.${lg ? ` Longest free stretch: ${fm(lg[0])}–${fm(lg[1])}.` : ""}${cl ? " Some things overlap; they're marked in amber." : ""}</p>
+      <div class="bh">Schedule</div>${calSVG(t1, "Tomorrow's schedule")}</div>
+    <div class="msg">
+      <div class="bh">To work on tomorrow</div>
+      ${todos.length ? `<ul>${todos.map((i) => `<li>${esc(i.title)} <span class="muted">· ${dueLbl(i.due, 1)[0]}${i.pct ? " · " + i.pct + "%" : ""}</span></li>`).join("")}</ul>` : `<p class="muted">No to-dos.</p>`}
+      ${projs.length ? `<p class="muted" style="margin-top:2px">Projects you can push on:</p><ul>${projs.map((p) => `<li>${esc(p.title)} <span class="muted">· ${p.pct || 0}%${p.due ? " · due " + short(p.due) : ""}</span></li>`).join("")}</ul>` : ""}
+      <div class="bh">On the horizon</div>
+      ${horizon.length ? `<ul>${horizon.slice(0, 6).map((h) => `<li>${nice(h.d)}: ${esc(h.t)}</li>`).join("")}</ul>` : `<p class="muted">Nothing big in the next two weeks.</p>`}
+      <div class="bh">Needs you</div>
+      ${appr.length || heads.length ? `<ul>${appr.map((p) => `<li>${esc(p.title)} <span class="muted">· approve or skip in Home</span></li>`).join("")}${heads.map((p) => `<li>Heads-up: ${esc(p.title)}</li>`).join("")}</ul>` : `<p class="muted">Nothing waiting on you.</p>`}
+      <div class="bh">For tonight</div>
+      <p class="quote">“${esc(q[0])}” <span class="muted" style="font-style:normal">— ${esc(q[1])}</span></p>
+      <div class="thumbs"><span class="muted">Like this kind of quote?</span>
+        <button aria-label="Thumbs up" class="${thumb === "up" ? "on" : ""}" data-a="thumb" data-v="up">👍</button>
+        <button aria-label="Thumbs down" class="${thumb === "down" ? "on" : ""}" data-a="thumb" data-v="down">👎</button></div>
+      ${thumb ? `<p class="muted">${thumb === "up" ? "Noted. Future briefs will lean toward quotes like this." : "Noted. Tomorrow's brief will try a different kind."}</p>` : ""}
+      <div><button class="btn pri" data-a="goHome">Open Home →</button></div>
+    </div>` };
+}
+function briefAM() {
+  const t0 = dayIso(0), ev = timed(t0), first = ev[0];
+  const urgent = S.items.filter((i) => i.type === "To-do" && visibleOn(i, t0)).sort(byDue)[0];
+  const who = owner() ? ", " + esc(owner()) : "";
+  return { time: "7:17 AM", notif: first ? `First thing: ${first.t} at ${fm(first.a)}.` : "Your calendar is clear today.", html: `
+    <div class="msg"><p><b>Good morning${who}.</b></p>
+      <p>First thing: ${first ? `<b>${esc(first.t)}</b> at ${fm(first.a)}` : "nothing booked, so the morning is yours"}.</p>
+      ${urgent ? `<p>Most urgent: <b>${esc(urgent.title)}</b>${urgent.due ? " (" + dueLbl(urgent.due, 0)[0].toLowerCase() + ")" : ""}.</p>` : ""}
+      <div class="bh">Today</div>${calSVG(t0, "Today's schedule")}</div>
+    <div class="msg"><div><button class="btn pri" data-a="goHome">Open Home →</button></div></div>` };
+}
+
+// ================= quick add =================
+const MON = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+function nextDow(d) { const map = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 }; const cur = new Date(TODAY() + "T12:00:00Z").getUTCDay(); let n = (map[d] - cur + 7) % 7; if (n === 0) n = 7; return addDays(TODAY(), n); }
+function getDate(s) {
+  const md = s.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(\d{1,2})\b/);
+  const dm = s.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/);
+  const dy = s.match(/\b(mon|tue|wed|thu|fri|sat|sun)[a-z]*\b/);
+  const mk = (m, d) => { const t = TODAY(); const y = Number(t.slice(0, 4)); const iso = (yy) => yy + "-" + pad(MON[m]) + "-" + pad(Number(d)); return iso(y) < t ? iso(y + 1) : iso(y); };
+  if (md) return mk(md[1], md[2]); if (dm) return mk(dm[2], dm[1]);
+  if (/\b(today|tonight)\b/.test(s)) return TODAY(); if (/\b(tomorrow|tmr|tmrw)\b/.test(s)) return addDays(TODAY(), 1);
+  if (dy) return nextDow(dy[1]); return "";
+}
+const pickKind = (lo, ms) => ms ? "exam" : /\b(dinner|lunch|coffee|drinks|brunch|party|friends?)\b/.test(lo) ? "social" : /\b(gym|run|yoga|spin|swim|workout)\b/.test(lo) ? "exercise" : /\b(class|lecture|seminar|section)\b/.test(lo) ? "classes" : /\bbirthday\b/.test(lo) ? "bday" : /\bdue\b/.test(lo) ? "deadlines" : "work";
+function parse(raw, f) {
+  const text = (raw || "").trim(); if (!text) return null;
+  const all = text.toLowerCase(); const bi = all.search(/\b(bump|remind)\b/);
+  const lo = bi >= 0 ? all.slice(0, bi) : all; const bumpDate = bi >= 0 ? getDate(all.slice(bi)) : "";
+  const ms = f === "exam" || (/\b(exam|final|midterm|interview)\b/.test(lo) && (!f || f === "event"));
+  const kind = (f === "exam" ? "event" : f) || (/\b(someday|eventually|idea)\b/.test(lo) ? "idea" : /\b(thesis|paper|project|outline|website)\b/.test(lo) ? "project" : ms || /\b(dinner|lunch|coffee|drinks|meet|meeting|class|gym|call|\d{1,2}(:\d{2})?\s*(am|pm))\b/.test(lo) ? "event" : "task");
+  const date = getDate(lo); const tm = lo.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/); let time = "";
+  if (tm) { let h = Number(tm[1]) % 12; if (tm[3] === "pm") h += 12; time = pad(h) + ":" + (tm[2] || "00"); }
+  const t0 = (bi >= 0 ? text.slice(0, bi) : text)
+    .replace(/\b(on\s+|by\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}(st|nd|rd|th)?\b/gi, "")
+    .replace(/\b(on\s+|by\s+)?\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\b/gi, "")
+    .replace(/\b(on\s+|this\s+|next\s+|by\s+)?(mon|tue|wed|thu|fri|sat|sun)[a-z]*\b(?!['’]s)/gi, "").replace(/\b(today|tonight|tomorrow|tmrw?)\b/gi, "")
+    .replace(/\b(at\s+)?\d{1,2}(:\d{2})?\s*(am|pm)\b/gi, "").replace(/\bdue\b/gi, "").replace(/^\s*(someday|eventually)\s+/i, "")
+    .replace(/\s{2,}/g, " ").replace(/[,;\s]+$/, "").trim() || text;
+  let show = bumpDate || addDays(TODAY(), 7);
+  if (!bumpDate && ms && date) { const b = addDays(date, -14); show = b <= TODAY() ? addDays(TODAY(), 1) : b; }
+  return { kind, title: t0.charAt(0).toUpperCase() + t0.slice(1), date: date || (kind === "event" ? addDays(TODAY(), 1) : ""),
+    time: time || (kind === "event" && !ms ? "19:00" : "09:00"), len: /\b(dinner|drinks)\b/.test(lo) ? "2" : "1", cal: (calByKey(pickKind(lo, ms)) || {}).k,
+    allDay: !!(ms && !time), bump: !!bumpDate || ms, show };
+}
+const TAGS = { event: "Event", exam: "Exam / interview", task: "To-do", project: "Project", idea: "Idea" };
+async function aiParse(text, blob) {
+  const t = TODAY(), keys = S.cals.map((c) => c.k);
+  const prompt = `You turn a quick note into planner items. Today is ${dowName(t)} ${t}.
+Reply with JSON only, no prose, in this shape:
+{"items":[{"kind":"event"|"task"|"project"|"idea","title":string,"date":"YYYY-MM-DD" or "","time":"HH:MM" 24-hour or "","len":hours as a number,"cal":${keys.map((k) => JSON.stringify(k)).join("|")},"allDay":true|false,"bump":true|false,"show":"YYYY-MM-DD" or ""}]}
+Calendars: ${S.cals.map((c) => c.k + " = " + c.n).join("; ")}.
+Rules:
+- Something at a specific time, or a meeting, class, call or meal, is an "event". Default length 1 hour; meals or drinks with friends 2.
+- Something to hand in or finish by a date is a "task", with that date as "date".
+- A long piece of work (paper, thesis, website, application) is a "project".
+- "someday", "eventually" or a wish is an "idea" with no date.
+- Exams and interviews are events (use the exams calendar if there is one) with bump true and show 14 days before the date (tomorrow if that has passed). All-day if no time is given.
+- "bump me" or "remind me" on a date means bump true and show = that date.
+- Title: short, keep names, drop date and time words.
+- A weekday means the next one after today. Never invent details that are not there.
+${S.qa.force ? `The user tagged this as: ${TAGS[S.qa.force]}.` : ""}
+${blob ? "Read the attached image (it may be an email, poster, syllabus or chat screenshot) and return up to 3 items from it." : ""}
+Note: """${text || "(see the image)"}"""`;
+  const opts = { modelTier: "quick" }; if (blob) opts.images = [blob];
+  let v;
+  if (typeof sampler.json === "function") v = await sampler.json(prompt, opts);
+  else { const r = await sampler(prompt, opts); v = JSON.parse(String(r.text).replace(/^\s*```(json)?/, "").replace(/```\s*$/, "")); }
+  const list = (v && Array.isArray(v.items) ? v.items : Array.isArray(v) ? v : []).slice(0, 3);
+  const okD = (s) => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s);
+  return list.map((x) => {
+    const kind = ["event", "task", "project", "idea"].includes(x.kind) ? x.kind : "task";
+    const title = String(x.title || text || "New item").slice(0, 80);
+    const cal = keys.includes(x.cal) ? x.cal : (calByKey(pickKind(title.toLowerCase(), false)) || {}).k;
+    const len = Number(x.len) > 0 && Number(x.len) <= 12 ? String(x.len) : "1";
+    return { kind, title, date: okD(x.date) ? x.date : (kind === "event" ? addDays(t, 1) : ""), time: typeof x.time === "string" && /^\d{2}:\d{2}$/.test(x.time) ? x.time : "09:00",
+      len, cal, allDay: !!x.allDay, bump: !!x.bump, show: okD(x.show) ? x.show : addDays(t, 7) };
+  });
+}
+async function readNote(text, blob) {
+  S.qa.note = "";
+  if (sampler) {
+    S.qa.busy = blob ? "Claude is reading your screenshot…" : "Claude is reading it…"; S.qa.card = null; render();
+    try {
+      const items = await aiParse(text, blob); if (!items.length) throw new Error("empty");
+      S.qa.card = items[0]; S.qa.queue = items.slice(1); S.qa.by = "ai"; S.qa.busy = ""; if (blob) mark("photo"); render(); return;
+    } catch (e) {
+      if (e && e.code === "not_granted") { sampler = null; canImg = false; }
+      S.qa.busy = "";
+      if (blob) { S.qa.note = "Claude couldn't read that image here. Try typing the details instead."; render(); return; }
+    }
+  }
+  if (blob) { S.qa.note = "Reading screenshots needs Claude. Type the details instead."; render(); return; }
+  S.qa.card = parse(text, S.qa.force); S.qa.queue = []; S.qa.by = "rules"; render();
+}
+function readCard() {
+  const c = Object.assign({}, S.qa.card); const v = (id) => { const el = document.getElementById(id); return el ? (el.type === "checkbox" ? el.checked : el.value) : undefined; };
+  ["title", "kind", "date", "time", "len", "cal", "allDay", "bump", "show"].forEach((k) => { const x = v("qc-" + k); if (x !== undefined) c[k] = x; });
+  return c;
+}
+async function createTask(title, type, due, show) {
+  const p = { Task: title, Type: type, Status: "To do", Source: "Quick add" };
+  if (due) p["date:Due:start"] = due; if (show) p["date:Show from:start"] = show;
+  if (S.mode === "live") S.items.push({ id: "tmp-" + nid(), title, type, due: due || null, show: show || null, pct: null });
+  await guarded(() => api().createItem(p));
+}
+async function saveCard() {
+  const c = readCard(); if (!c.title) return;
+  const next = S.qa.queue.shift();
+  S.qa = Object.assign(S.qa, next ? { card: next } : { text: "", card: null, queue: [], by: "", note: "" });
+  let msg;
+  if (c.kind === "event") {
+    const cal = calByKey(c.cal), date = c.date || addDays(TODAY(), 1);
+    let start, end;
+    if (c.allDay) { start = date + "T00:00:00"; end = addDays(date, 1) + "T00:00:00"; }
+    else { const m = hm(c.time || "09:00") + Math.round(Number(c.len || 1) * 60); const dd = Math.floor(m / 1440), mm = m % 1440; start = date + "T" + (c.time || "09:00") + ":00"; end = addDays(date, dd) + "T" + toHM(mm) + ":00"; }
+    await guarded(() => api().createEvent(cal.id, c.title, start, end, c.allDay));
+    if (c.bump) await createTask("Plan for " + c.title, "To-do", "", c.show);
+    const t = tour(); if (t) { t.event = true; t.eventDay = diff(date); if (c.bump) t.bump = true; }
+    const d = diff(date);
+    msg = "Added to " + cal.n + (d === 0 ? ". It's on Today." : d === 1 ? ". It's on Tomorrow and in tonight's brief." : " for " + nice(date) + ".") + (c.bump ? " “Plan for…” is bumped until " + short(c.show) + "." : "");
+  } else {
+    const type = c.kind === "task" ? "To-do" : c.kind === "project" ? "Project" : "Idea";
+    await createTask(c.title, type, c.kind === "idea" ? "" : c.date, c.bump ? c.show : "");
+    const t = tour(); if (t) { if (type !== "Idea") t.task = true; if (c.bump) t.bump = true; }
+    msg = "Added to " + (type === "To-do" ? "your to-do list" : type === "Project" ? "Projects" : "Ideas") + (c.bump ? ", bumped until " + short(c.show) : "") + ".";
+  }
+  saveSample(); toast(msg + (next ? " Here's the next one." : ""));
+  if (S.mode === "live") load();
+}
+
+// ================= actions =================
+function toast(text, undoFn, onExpire, ms = 6000) {
+  if (S.undo) { clearTimeout(S.undo.timer); if (S.undo.onExpire) S.undo.onExpire(); }
+  S.undo = { text, undoFn, onExpire, timer: setTimeout(() => { if (S.undo && S.undo.onExpire) S.undo.onExpire(); S.undo = null; render(); }, ms) };
+  render();
+}
+const item = (id) => S.items.find((i) => i.id === id);
+const findEv = (id) => S.events.find((e) => e.id === id);
+function go(view) { if (location.hash !== "#" + view) location.hash = view; else route(); }
+const setTab = (v) => { S.tab = v; document.body.dataset.tab = v; };
+const A = {
+  goHome: () => go("home"),
+  choose: (m) => chooseMode(m),
+  switchMode: () => { S.gateInfo = null; S.mode = null; store.del("cos-mode"); render(); },
+  refresh: () => load(),
+  brief: (v) => { S.brief = v; sawBrief(); render(); },
+  thumb: (v) => { if (S.mode === "sample" && SD) { SD.thumb = SD.thumb === v ? null : v; saveSample(); } else S.thumb = S.thumb === v ? null : v; render(); },
+  resetSample: () => { const keep = SD; loadSample(true); saveSample(); S.open = S.evOpen = null; toast("Sample week reset", () => { SD = keep; S.items = SD.items; S.props = SD.props; S.events = SD.events; saveSample(); render(); }); },
+  tourToggle: () => { S.tourOpen = !S.tourOpen; render(); },
+  tourGo: (k) => {
+    const later = (fn) => setTimeout(fn, 60);
+    const show = (id) => later(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); });
+    if (k === "brief" || k === "again") { S.brief = k === "again" && tour().eventDay === 0 ? "am" : "pm"; go("briefs"); return; }
+    if (k === "task" || k === "event") { S.qa.force = k; S.qa.card = null; go("home"); later(() => { const el = document.getElementById("qa-in"); if (el) { el.placeholder = k === "task" ? "Something you need to do, e.g. “read for Thursday's class by wed”" : "A real plan, e.g. “dinner with Jamie tomorrow 7pm”"; el.focus(); el.scrollIntoView({ block: "center" }); } }); return; }
+    if (k === "approve") { setTab("today"); go("home"); show("appr"); return; }
+    if (k === "bump") { setTab("todo"); const f = S.items.filter((i) => i.type === "To-do" && visibleOn(i, TODAY())).sort(byDue)[0]; if (f) S.open = f.id; go("home"); show("todos"); return; }
+    if (k === "progress") { setTab("todo"); go("home"); show("todos"); }
+  },
+  tab: (v) => { setTab(v); render(); },
+  day: (v) => { S.day = Number(v); S.evOpen = null; render(); },
+  open: (id) => { S.open = S.open === id ? null : id; render(); },
+  done: (id) => { const it = item(id); it.done = true; mark("progress"); render();
+    guarded(() => api().updateItem(id, { Status: "Done" }));
+    toast("Done: " + it.title, () => { it.done = false; render(); guarded(() => api().updateItem(id, { Status: "To do" })); }); },
+  pct: (id, v) => { item(id).pct = Number(v); mark("progress"); render(); guarded(() => api().updateItem(id, { "Progress %": Number(v) })); },
+  bump: (id) => { const el = document.getElementById("bd-" + id); const d = el && el.value; if (!d) return; item(id).show = d; S.open = null; mark("bump");
+    guarded(() => api().updateItem(id, { "date:Show from:start": d }), "Bumped until " + short(d) + ". It's in “Bumped for later”."); },
+  showNow: (id) => { item(id).show = null; render(); guarded(() => api().updateItem(id, { "date:Show from:start": null })); },
+  type: (id, t) => { item(id).type = t; S.open = null; render(); guarded(() => api().updateItem(id, { Type: t }), t === "Project" ? "Moved to Projects" : t === "To-do" ? "Moved to To-do" : null); },
+  del: (id) => { const it = item(id); it.hidden = true; S.open = null; render();
+    toast("Deleted: " + it.title, () => { it.hidden = false; render(); }, () => { if (it.hidden) api().deleteItem(id).then(() => { S.items = S.items.filter((i) => i !== it); render(); }).catch((e) => { it.hidden = false; S.err = "Delete failed: " + (e.message || e); render(); }); }); },
+  addIdea: () => { const el = document.getElementById("idea-in"); const t = el.value.trim(); if (!t) return; el.value = ""; createTask(t, "Idea", "", "").then(() => { render(); if (S.mode === "live") load(); }); },
+  approve: async (id) => {
+    const p = S.props.find((x) => x.id === id), a = p && p.action;
+    if (!a || !["create", "update"].includes(a.op)) { S.err = "This proposal has no valid change attached."; render(); return; }
+    if (!calById(a.calendarId)) { S.err = "That proposal points at a calendar this page doesn't manage, so it wasn't applied."; render(); return; }
+    S.busy[id] = true; render();
+    try {
+      if (a.op === "create") await api().createEvent(a.calendarId, a.summary, a.startTime, a.endTime, !!a.allDay);
+      else await api().updateEvent(a.calendarId, a.eventId, a.startTime, a.endTime);
+      await api().setProp(id, "Approved");
+      S.props = S.props.filter((x) => x.id !== id); mark("approve");
+      toast("Approved. Your calendar is updated" + (a.startTime && a.startTime.slice(0, 10) === TODAY() ? ": see Today." : ": see Tomorrow."));
+      if (S.mode === "live") load();
+    } catch (e) { S.err = "Couldn't apply it: " + ((e && (e.message || e.code)) || e); }
+    delete S.busy[id]; render();
+  },
+  skip: (id, status) => { S.props = S.props.filter((x) => x.id !== id); render(); guarded(() => api().setProp(id, status || "Skipped")); },
+  bumpedToggle: () => { S.bumpedOpen = !S.bumpedOpen; render(); },
+  laterToggle: () => { S.laterOpen = !S.laterOpen; render(); },
+  evOpen: (id) => { S.evOpen = S.evOpen === id ? null : id; render(); },
+  evSave: async (id) => {
+    const e = findEv(id); if (!e) return;
+    const a = document.getElementById("ee-a").value, b = document.getElementById("ee-b").value;
+    if (!a || !b || b <= a) { S.err = "End time needs to be after the start."; render(); return; }
+    S.busy[id] = true; S.err = ""; render();
+    try { await api().updateEvent(e.calId, id, e.day + "T" + a + ":00", e.day + "T" + b + ":00"); S.evOpen = null; mark(); toast("Moved " + e.t + " to " + a + "–" + b); }
+    catch (err) { S.err = "Couldn't move it: " + ((err && (err.message || err.code)) || err); }
+    delete S.busy[id]; if (S.mode === "live") load(); else render();
+  },
+  evDel: (id) => {
+    const e = findEv(id); if (!e) return; e.hidden = true; S.evOpen = null; render();
+    toast("Removed " + e.t + " from " + calName(e.calId), () => { e.hidden = false; render(); },
+      () => { if (e.hidden) api().deleteEvent(e.calId, id).then(() => { if (S.mode === "live") load(); else render(); }).catch((err) => { e.hidden = false; S.err = "Couldn't remove it: " + ((err && (err.message || err.code)) || err); render(); }); });
+  },
+  qaForce: (k) => { S.qa.force = k; render(); },
+  qaGo: () => { const el = document.getElementById("qa-in"); const t = (el ? el.value : S.qa.text).trim(); if (!t) return; S.qa.text = t; readNote(t, null); },
+  qaEx: (t) => { S.qa.text = t; readNote(t, null); },
+  qaCancel: () => { S.qa = Object.assign(S.qa, { text: "", card: null, queue: [], by: "", busy: "", note: "" }); render(); },
+  qaSave: () => saveCard()
+};
+
+// ================= views =================
+function gateHTML() {
+  const info = S.gateInfo;
+  const install = `<ol class="steps">
+      <li>Download <a href="${esc(ZIP)}">chief-of-staff-skill.zip</a> from <a href="${esc(CONFIG.repo)}">the GitHub repo</a>.</li>
+      <li>In Claude, go to <b>Customize → Skills</b>, tap <b>+</b>, then <b>Create skill → Upload a skill</b>, and choose the zip.</li>
+      <li>Connect the <b>Notion</b> and <b>Google Calendar</b> connectors.</li>
+      <li>In a new chat, say <b>“Set up my chief of staff.”</b> Claude creates your lists, asks which calendars to use, builds your own copy of this page and schedules your briefs.</li></ol>`;
+  const extra = info === "unlinked" ? `<div class="card" style="border-color:#99F6E4;background:#F0FDFA"><b>This copy isn't linked to anyone's accounts.</b><span style="font-size:13px">It's the shared copy, so it can't reach your Google Calendar or Notion. To run it on your own accounts (about 5 minutes):</span>${install}</div>`
+    : info === "nomcp" ? `<div class="card" style="border-color:#FECACA;background:#FEF2F2"><b>Your accounts aren't reachable from this copy.</b><span style="font-size:13px">That happens when the page belongs to someone else, or Claude can't use connectors here. To get your own copy:</span>${install}</div>`
+    : info === "checking" ? `<div class="note">Checking your connections…</div>` : "";
+  return `<div class="gate">
+    <div class="card">
+      <h1>Chief of Staff</h1>
+      <p style="margin:0">An AI that runs your to-dos and calendar. It sends you an evening and a morning brief, and it never changes your calendar without your OK.</p>
+      <ul><li><b>Google Calendar</b> holds your events.</li><li><b>Notion</b> holds your to-dos, projects and ideas.</li><li>It never reads your email, never blocks time for you, and can't delete anything without an undo.</li></ul>
+      <div class="choice">
+        <button class="btn pri" data-a="choose" data-v="live">Allow: use my Google Calendar and Notion</button>
+        <button class="btn" data-a="choose" data-v="sample">Not now: try it on a sample week</button>
+      </div>
+      <span class="muted">${LINKED ? "Allow asks Claude for permission to use your connectors. You can switch any time." : "Not now runs the real app on a made-up student's week. Nothing touches your accounts, and changes stay in this browser."}</span>
+    </div>
+    ${extra}</div>`;
+}
+const STEPS = [
+  ["brief", "Read tonight's 8 pm brief", "Tomorrow's schedule drawn to scale, everything to work on, and what needs your OK."],
+  ["task", "Add one of your own to-dos", "Type something you really need to do this week, like “finish reading for Thursday's class”. Check the card, then save."],
+  ["event", "Add one of your own plans", "Something real, like “dinner with Jamie tomorrow 7pm”. Pick the calendar and save. Saving is your approval."],
+  ["approve", "Approve what the nightly check found", "Fix the office-hours clash or add interview prep. Nothing changes until you say so."],
+  ["bump", "Bump something for later", "Open a to-do's options (the slider icon) and pick a date. It waits in “Bumped for later” and comes back on its own."],
+  ["progress", "Make progress", "Tick off a to-do, or move a project's slider. You set progress; the bot never guesses it."],
+  ["again", "Open a brief again", "Your own to-do and plan are in it now, because each brief re-reads everything."]
+];
+function tourHTML() {
+  const t = tour(); if (!t) return "";
+  const done = STEPS.filter(([k]) => t[k]).length, all = done === STEPS.length, next = (STEPS.find(([k]) => !t[k]) || [])[0];
+  const bar = `<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${STEPS.length}" aria-valuenow="${done}"><span style="width:${done / STEPS.length * 100}%"></span></div>`;
+  if (!S.tourOpen) return `<div class="tour"><div class="tourhead"><b style="color:#134E4A">Guided tour · ${done} of ${STEPS.length} done</b><button class="btn sm" data-a="tourToggle">Show tour</button></div>${bar}</div>`;
+  const againHint = t.event && t.eventDay === 0 ? " Your plan is today, so check the morning brief." : t.event && t.eventDay > 1 ? " Your plan is later this week, so it'll show in that day's briefs; your to-do shows tonight." : "";
+  return `<div class="tour"><div class="tourhead"><b style="color:#134E4A">Guided tour · ${done} of ${STEPS.length} done</b><button class="btn sm" data-a="tourToggle">Hide</button></div>${bar}
+    <ol>${STEPS.map(([k, title, txt], i) => `<li class="${t[k] ? "ok" : ""} ${k === next ? "next" : ""}"><span class="tick ${t[k] ? "ok" : ""}">${t[k] ? "✓" : i + 1}</span>
+      <span class="tt"><b>${title}</b>${k === next ? `<br><span>${txt}${k === "again" ? againHint : ""}</span>` : ""}</span>
+      ${k === next ? `<button class="go" data-a="tourGo" data-v="${k}">Show me</button>` : ""}</li>`).join("")}</ol>
+    ${sampler && canImg ? `<span style="font-size:12px;color:#134E4A">${t.photo ? "✓ " : ""}<b>Bonus:</b> in Quick add, tap “📷 From a screenshot” and upload a poster, email or syllabus. Claude turns it into events.</span>` : ""}
+    ${all ? `<span style="font-size:13px;color:#134E4A"><b>That's the whole loop.</b> You put things in however is easiest, you approve what changes, and every brief reads it fresh. To run it on your own calendar, see <a href="#about">About</a>.</span>` : ""}</div>`;
+}
+function briefsView() {
+  const b = S.brief === "pm" ? briefPM() : briefAM();
+  return `<div class="cols"><div class="col" style="flex:1">
+    <div class="seg">${[["pm", "Evening · 8 pm"], ["am", "Morning · 7:17 am"]].map(([k, t]) => `<button class="chip ${S.brief === k ? "on" : ""}" aria-pressed="${S.brief === k}" data-a="brief" data-v="${k}">${t}</button>`).join("")}</div>
+    <div class="briefwrap">
+      <div class="notif"><span class="app" aria-hidden="true">✳</span><div><b>Claude</b> <span class="muted">· ${b.time}</span><br>${esc(b.notif)}</div></div>
+      <div class="chat"><div class="chathead"><span>${S.brief === "pm" ? "Evening brief" : "Morning brief"} · new chat</span><span>${b.time}</span></div>${b.html}</div>
+    </div></div>
+    <div class="col" style="flex:0 1 380px"><div class="card"><h2>About the briefs</h2>
+      <p style="margin:0;font-size:13px">Every day the Chief of Staff starts a new Claude chat and sends a notification. ${S.brief === "pm"
+        ? "<b>The 8 pm brief</b> previews tomorrow: the schedule drawn to scale (free time in green, clashes in amber), everything you could work on, what's coming up, what needs your OK, and a quote you can rate."
+        : "<b>The morning brief</b> is short: your first commitment, the most urgent to-do and today's calendar. It reads the calendar fresh, so changes you make after the 8 pm brief show up."}</p>
+      <p style="margin:0;font-size:13px">This is a preview built from ${S.mode === "live" ? "your calendar and Notion right now" : "the sample week"}. ${S.mode === "live" ? "The real ones arrive as Claude chats on schedule." : "Change something in Home and it updates here too."}</p></div></div></div>`;
+}
+function calHTML(off) {
+  const iso = dayIso(off), evs = timed(iso), ad = allday(iso);
+  let D0 = 480, D1 = 1320;
+  evs.forEach((e) => { D0 = Math.min(D0, Math.floor(e.a / 60) * 60); D1 = Math.max(D1, Math.ceil(e.b / 60) * 60); });
+  const HP = 30, px = (m) => Math.round((m - D0) / 60 * HP), cl = clashes(evs);
+  const cols = evs.map((e, i) => cl[i] && evs.slice(0, i).some((o, j) => cl[j] && o.a < e.b && e.a < o.b) ? 1 : 0);
+  const gaps = freeGaps(evs);
+  const blk = (a, b, t, time, cls, left, width, id) => { const h = Math.max(px(b) - px(a) - 2, 14), one = h < 28;
+    return `<div class="ev ${cls}${id && S.evOpen === id ? " sel" : ""}" ${id ? `data-a="evOpen" data-u="${esc(id)}" role="button" tabindex="0" aria-label="Edit ${esc(t)}"` : ""} style="top:${px(a) + 1}px;height:${h}px;left:${left};width:${width}"><b>${esc(one ? t + " · " + time : t)}</b>${one ? "" : `<span>${esc(time)}</span>`}</div>`; };
+  let h = "";
+  for (let m = D0; m <= D1; m += 120) h += `<div class="hr" style="top:${px(m)}px"><span>${m / 60}:00</span></div>`;
+  gaps.forEach(([a, b]) => h += blk(a, b, "Free · " + dur(b - a), fm(a) + "–" + fm(b), "free", "0", "100%"));
+  evs.forEach((e, i) => h += blk(e.a, e.b, e.t + (cl[i] ? " (clash)" : ""), fm(e.a) + "–" + fm(e.b) + " · " + calName(e.calId), cl[i] ? "warn" : "base", cl[i] && cols[i] ? "calc(50% + 2px)" : "0", cl[i] ? "calc(50% - 2px)" : "100%", e.id));
+  const lg = longestGap(gaps);
+  const sel = S.evOpen && S.events.find((e) => e.id === S.evOpen && e.day === iso);
+  let ed = `<span class="muted">Tap an event to move or remove it.</span>`;
+  if (sel) {
+    const head = `<b>${esc(sel.t)}</b><span class="muted">${esc(calName(sel.calId))}${sel.recurring ? " · repeating event: this changes only this one" : ""}${sel.guests && sel.mine ? " · " + sel.guests + " guest" + (sel.guests > 1 ? "s" : "") + " will be notified" : ""}</span>`;
+    ed = !sel.mine ? `<div class="edit">${head}<span class="muted">You were invited to this one, so change it in Google Calendar.</span><div><button class="btn sm" data-a="evOpen" data-u="${esc(sel.id)}">Close</button></div></div>`
+      : `<div class="edit">${head}
+        ${sel.allDay ? "" : `<div class="grid2"><div class="f"><label for="ee-a" style="color:#374151">Start</label><input class="ctl" style="border-color:#D1D5DB" type="time" id="ee-a" value="${toHM(sel.a)}"></div><div class="f"><label for="ee-b" style="color:#374151">End</label><input class="ctl" style="border-color:#D1D5DB" type="time" id="ee-b" value="${toHM(Math.min(sel.b, 1439))}"></div></div>`}
+        <div class="line">${S.busy[sel.id] ? `<span class="muted">Saving…</span>` : `${sel.allDay ? "" : `<button class="btn sm pri" data-a="evSave" data-u="${esc(sel.id)}">Save time</button>`}<button class="btn sm danger" data-a="evDel" data-u="${esc(sel.id)}">Remove</button><button class="btn sm" data-a="evOpen" data-u="${esc(sel.id)}">Close</button>`}</div></div>`;
+  }
+  return `<span class="muted" style="color:#065F46">${lg ? gaps.length + " free gap" + (gaps.length > 1 ? "s" : "") + " · longest " + fm(lg[0]) + "–" + fm(lg[1]) : "No free time between 8:00 and 22:00"}</span>
+    ${ad.map((x) => `<button class="allday" data-a="evOpen" data-u="${esc(x.id)}">All day · ${esc(x.t)}</button>`).join("")}
+    ${ed}
+    <div class="cal" style="height:${(D1 - D0) / 60 * HP}px">${h}</div>`;
+}
+function todoRow(i) {
+  const [dt, dc] = dueLbl(i.due); const open = S.open === i.id; const pct = i.pct || 0; const bv = addDays(TODAY(), 7), u = esc(i.id);
+  return `<div><div class="row">
+      <input type="checkbox" aria-label="Mark ${esc(i.title)} done" data-a="done" data-u="${u}">
+      <span class="t">${esc(i.title)}</span>
+      ${pct ? `<span class="pill teal">${pct}%</span>` : ""}<span class="pill ${dc}">${dt}</span>
+      <button class="icon" aria-label="Options for ${esc(i.title)}" aria-expanded="${open}" data-a="open" data-u="${u}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 12h16"></path><circle cx="9" cy="12" r="3"></circle></svg></button>
+    </div>
+    ${open ? `<div class="panel">
+      <div class="line"><label for="pr-${u}" class="muted">How far?</label><input id="pr-${u}" type="range" min="0" max="100" step="10" value="${pct}" data-a="pct" data-u="${u}"><b>${pct}%</b></div>
+      <div class="line"><label for="bd-${u}" class="muted">Bump until</label><input class="datein" id="bd-${u}" type="date" value="${bv}"><button class="btn sm" data-a="bump" data-u="${u}">Bump</button></div>
+      <div class="line"><button class="btn sm" data-a="type" data-v="Project" data-u="${u}">Turn into project</button><button class="btn sm danger" data-a="del" data-u="${u}">Delete</button></div>
+    </div>` : ""}</div>`;
+}
+function quickAddHTML() {
+  const c = S.qa.card, q = S.qa;
+  const tag = (k, t) => `<button class="chip ${q.force === k ? "on" : ""}" aria-pressed="${q.force === k}" data-a="qaForce" data-v="${k}">${t}</button>`;
+  return `<div class="qa">
+    <div class="qa-row"><label for="qa-in" class="sr">Quick add</label>
+      <input id="qa-in" placeholder="Quick add: “pset due fri”, “coffee w Alex tmr 4pm”" value="${esc(q.text)}" data-f="qa">
+      <button class="btn pri" data-a="qaGo" ${q.busy ? "disabled" : ""}>Add</button></div>
+    <div class="chips">${tag("", "Auto")}${tag("event", "Event")}${tag("exam", "Exam / interview")}${tag("task", "To-do")}${tag("project", "Project")}${tag("idea", "Idea")}
+      ${sampler && canImg ? `<label class="chip photo">📷 From a screenshot<input type="file" accept="image/*" aria-label="Add from a screenshot" data-f="photo"></label>` : ""}</div>
+    ${S.mode === "sample" ? `<div class="chips"><span class="muted">Try:</span>${["coffee w Alex tmr 4pm", "pset 6 due fri", "stats midterm 15 dec, bump me on 5 dec", "someday learn to sail"].map((t) => `<button class="chip" data-a="qaEx" data-v="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
+    <span class="muted">${sampler ? "✨ Claude reads what you type and fills in the details." : "Simple rules read what you type."} Saving is your approval.</span>
+    ${q.busy ? `<div class="qcard"><span style="color:#115E59">${esc(q.busy)}</span></div>` : ""}
+    ${q.note ? `<div class="note">${esc(q.note)}</div>` : ""}
+    ${c ? `<div class="qcard">
+      <span class="by ${q.by === "ai" ? "ai" : "rules"}">${q.by === "ai" ? "✨ Read by Claude" : "Read by simple rules"}${q.queue.length ? " · " + (q.queue.length + 1) + " items found" : ""}</span>
+      <div class="f"><label for="qc-title">Title</label><input class="ctl" id="qc-title" value="${esc(c.title)}"></div>
+      <div class="grid2">
+        <div class="f"><label for="qc-kind">Type</label><select class="ctl" id="qc-kind" data-a="qcKind">${[["event", "Calendar event"], ["task", "To-do"], ["project", "Project"], ["idea", "Idea"]].map(([v, t]) => `<option value="${v}" ${c.kind === v ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+        ${c.kind !== "idea" ? `<div class="f"><label for="qc-date">${c.kind === "event" ? "Date" : c.kind === "project" ? "Deadline" : "Due (optional)"}</label><input class="ctl" type="date" id="qc-date" value="${esc(c.date)}"></div>` : ""}
+        ${c.kind === "event" ? `
+          <div class="f"><label for="qc-time">Time</label><input class="ctl" type="time" id="qc-time" value="${esc(c.time)}"></div>
+          <div class="f"><label for="qc-len">Length</label><select class="ctl" id="qc-len">${[0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6].map((h) => `<option value="${h}" ${String(h) === String(c.len) ? "selected" : ""}>${h < 1 ? "30 min" : h + (h === 1 ? " hour" : " hours")}</option>`).join("")}</select></div>
+          <div class="f"><label for="qc-cal">Calendar</label><select class="ctl" id="qc-cal">${S.cals.map((x) => `<option value="${esc(x.k)}" ${x.k === c.cal ? "selected" : ""}>${esc(x.n)}</option>`).join("")}</select></div>` : ""}
+      </div>
+      ${c.kind === "event" ? `<label class="check"><input type="checkbox" id="qc-allDay" ${c.allDay ? "checked" : ""}>All-day</label>` : ""}
+      <label class="check"><input type="checkbox" id="qc-bump" ${c.bump ? "checked" : ""} data-a="qcBump"><span><b>Bump me later:</b> ${c.kind === "event" ? "add a to-do “Plan for " + esc(c.title) + "”, hidden until a date" : c.kind === "task" ? "keep it off my list until a date" : c.kind === "project" ? "keep it under ‘Starting later’ until a date" : "keep it out of Ideas until a date"}</span></label>
+      ${c.bump ? `<div class="grid2"><div class="f"><label for="qc-show">Show it from</label><input class="ctl" type="date" id="qc-show" value="${esc(c.show)}"></div></div>` : ""}
+      <div class="qa-row"><button class="btn pri" style="flex:1" data-a="qaSave">${c.kind === "event" ? "Add to calendar" : c.kind === "task" ? "Add to to-do" : c.kind === "project" ? "Add project" : "Add idea"}</button><button class="btn" data-a="qaCancel">Cancel</button></div>
+    </div>` : ""}
+  </div>`;
+}
+function homeView() {
+  const T = TODAY();
+  const todos = S.items.filter((i) => i.type === "To-do" && visibleOn(i, T)).sort(byDue);
+  const projs = S.items.filter((i) => i.type === "Project" && visibleOn(i, T)).sort(byDue);
+  const later = S.items.filter((i) => i.type === "Project" && bumpedNow(i));
+  const ideas = S.items.filter((i) => i.type === "Idea" && visibleOn(i, T));
+  const bumps = S.items.filter(bumpedNow).sort((a, b) => a.show < b.show ? -1 : 1);
+  const appr = S.props.filter((p) => p.kind === "Approval"), heads = S.props.filter((p) => p.kind !== "Approval");
+  const dueToday = todos.filter((i) => i.due && diff(i.due) <= 0).length, soon = todos.filter((i) => i.due && diff(i.due) > 0 && diff(i.due) <= 3).length;
+  const tabs = [["today", "Today"], ["todo", "To-do"], ["projects", "Projects"], ["ideas", "Ideas"]];
+  const loadingFirst = S.mode === "live" && S.loading && !S.synced;
+  return `${quickAddHTML()}
+  <div class="tabs" role="tablist">${tabs.map(([k, t]) => `<button class="tab ${S.tab === k ? "on" : ""}" role="tab" aria-selected="${S.tab === k}" data-a="tab" data-v="${k}">${t}</button>`).join("")}</div>
+  <div class="cols">
+    <div class="col left">
+      <section class="card" data-tab="today">
+        <div style="display:flex;justify-content:space-between;align-items:center"><h2>Calendar</h2>
+          <div class="seg">${[[0, "Today"], [1, "Tomorrow"]].map(([k, t]) => `<button class="chip ${S.day === k ? "on" : ""}" data-a="day" data-v="${k}">${t}</button>`).join("")}</div></div>
+        ${loadingFirst ? `<div class="empty">Loading your calendar…</div>` : calHTML(S.day)}
+      </section>
+      <section class="card ideas" data-tab="ideas">
+        <div style="display:flex;justify-content:space-between"><h2>Long-term ideas</h2><span class="muted" style="color:#92400E">${ideas.length} ${ideas.length === 1 ? "idea" : "ideas"}</span></div>
+        ${ideas.length ? ideas.map((i) => `<div class="row" style="border-color:#FDE68A"><span class="t">${esc(i.title)}</span><button class="btn sm" data-a="type" data-v="Project" data-u="${esc(i.id)}">Make project</button><button class="btn sm danger" aria-label="Delete ${esc(i.title)}" data-a="del" data-u="${esc(i.id)}">×</button></div>`).join("") : `<div class="empty">No ideas yet.</div>`}
+        <div class="qa-row"><label for="idea-in" class="sr">Add an idea</label><input id="idea-in" class="ctl" style="border-color:#FCD34D;height:40px" placeholder="Jot an idea…" data-f="idea"><button class="btn sm" style="background:#B45309;border-color:#B45309;color:#fff;min-height:40px" data-a="addIdea">Add</button></div>
+        <span class="muted" style="color:#92400E">Ideas stay out of the daily briefs unless you ask.</span>
+      </section>
+    </div>
+    <div class="col right">
+      <section class="card" data-tab="today" id="appr">
+        <h2>Pending approval (${appr.length})</h2>
+        <span class="muted">Found by the nightly check. Nothing changes until you approve.</span>
+        ${appr.length ? appr.map((p) => `<div class="prop"><span class="muted">Nightly check${p.date ? " · " + (diff(p.date) === 0 ? "today" : diff(p.date) === 1 ? "tomorrow" : short(p.date)) : ""}</span><b>${esc(p.title)}</b><span>${esc(p.detail || "")}</span>
+          <div class="qa-row">${S.busy[p.id] ? `<span class="muted">Applying…</span>` : `<button class="btn pri" style="flex:1" data-a="approve" data-u="${esc(p.id)}">Approve</button><button class="btn" style="flex:1" data-a="skip" data-v="Skipped" data-u="${esc(p.id)}">Skip</button>`}</div></div>`).join("") : `<div class="empty">Nothing needs your OK.</div>`}
+        ${heads.length ? `<h2 style="margin-top:6px">Heads-up</h2>` + heads.map((p) => `<div class="prop"><b>${esc(p.title)}</b><span>${esc(p.detail || "")}</span><div><button class="btn sm" data-a="skip" data-v="Seen" data-u="${esc(p.id)}">Got it</button></div></div>`).join("") : ""}
+      </section>
+      <section class="card" data-tab="todo" id="todos">
+        <div style="display:flex;justify-content:space-between"><h2>To-do</h2><span class="muted">${dueToday} today · ${soon} soon</span></div>
+        ${todos.length ? todos.map(todoRow).join("") : `<div class="empty">${loadingFirst ? "Loading…" : "Nothing on your list."}</div>`}
+      </section>
+      <section class="card" data-tab="projects">
+        <h2>Projects</h2>
+        ${projs.length ? projs.map((p) => `<div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #F3F4F6;padding-top:8px">
+          <div style="display:flex;justify-content:space-between;gap:8px"><b style="font-weight:500">${esc(p.title)}</b><span class="muted">${p.due ? "Due " + short(p.due) : "No deadline"}</span></div>
+          <div class="line"><label class="sr" for="pp-${esc(p.id)}">Progress for ${esc(p.title)}</label><input id="pp-${esc(p.id)}" type="range" min="0" max="100" step="5" value="${p.pct || 0}" data-a="pct" data-u="${esc(p.id)}"><b style="width:36px;text-align:right">${p.pct || 0}%</b></div>
+          <div style="display:flex;gap:6px"><button class="btn sm" data-a="type" data-v="To-do" data-u="${esc(p.id)}">Move to to-do</button><button class="btn sm danger" data-a="del" data-u="${esc(p.id)}">Delete</button></div></div>`).join("") : `<div class="empty">No projects yet.</div>`}
+        ${later.length ? `<button class="btn sm" style="align-self:flex-start;border:none;padding:0;background:transparent" aria-expanded="${S.laterOpen}" data-a="laterToggle">${S.laterOpen ? "▾" : "▸"} Starting later (${later.length})</button>
+          ${S.laterOpen ? later.map((p) => `<div class="row"><span class="t">${esc(p.title)}<br><span class="muted">shows from ${short(p.show)}</span></span><button class="btn sm" data-a="showNow" data-u="${esc(p.id)}">Start now</button></div>`).join("") : ""}` : ""}
+        <span class="muted">You move the slider yourself. The bot never estimates your progress or how long things take.</span>
+      </section>
+      <section class="card bumped" data-tab="todo">
+        <button class="btn sm" style="border:none;background:transparent;justify-content:space-between;display:flex;align-items:center;width:100%;padding:0;font-weight:600" aria-expanded="${S.bumpedOpen}" data-a="bumpedToggle"><span>${S.bumpedOpen ? "▾" : "▸"} Bumped for later (${bumps.length})</span><span style="color:#0F766E;font-weight:500">${S.bumpedOpen ? "Hide" : "Show all"}</span></button>
+        ${S.bumpedOpen ? (bumps.length ? bumps.map((i) => `<div class="row"><span class="pill ${i.type === "Project" ? "blue" : i.type === "Idea" ? "amber" : "teal"}">${esc(i.type)}</span><span class="t">${esc(i.title)}<br><span class="muted">back ${nice(i.show)}</span></span><button class="btn sm" data-a="showNow" data-u="${esc(i.id)}">Show now</button></div>`).join("") : `<div class="empty">Nothing bumped.</div>`) : ""}
+      </section>
+    </div>
+  </div>`;
+}
+function aboutView() {
+  const box = (cls, b, t) => `<div class="box ${cls}"><b>${b}</b>${t}</div>`;
+  const row = (lbl, boxes) => `<div class="flowrow"><div class="lbl">${lbl}</div><div class="boxes">${boxes}</div></div>`;
+  return `<div class="prose">
+    <div><h3>How it works</h3><p class="muted" style="font-size:13px;margin-top:4px">An AI chief of staff for your to-dos and calendar. You start each day knowing what's coming, and it never changes your calendar without your OK.</p></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${row("You put things in", box("b-you", "Quick add", "Type a note here. Claude reads it.") + box("b-you", "Photo or message", "Send a screenshot of a poster or email in a Claude chat.") + box("b-you", "Google Calendar", "Or just edit your calendar directly."))}
+      <div class="arrow" aria-hidden="true">↓</div>
+      ${row("Where it lives", box("b-store", "Google Calendar", "Events, on calendars by kind: classes, deadlines, exams, social…") + box("b-store", "Notion", "To-dos, projects, ideas, plus the bot's proposals."))}
+      <div class="arrow" aria-hidden="true">↓</div>
+      ${row("Runs on its own", box("b-run", "8 pm evening brief", "Claude scheduled task, every day.") + box("b-run", "Morning brief", "Claude scheduled task; reads the calendar fresh.") + box("b-run", "Nightly check (optional)", "A small agent on GitHub Actions looks for clashes and gaps."))}
+      <div class="arrow" aria-hidden="true">↓</div>
+      ${row("Comes back to you", box("b-back", "Brief in Claude", "New chat + notification, with the day drawn to scale.") + box("b-back", "This page", "Proposals wait for Approve or Skip; one tap applies them."))}
+    </div>
+    <div><h3>Design choices</h3></div>
+    <div class="choices">
+      <div class="cbox"><b>You approve every calendar change</b>Saving in Quick add counts as approval. The nightly check can only suggest.</div>
+      <div class="cbox"><b>No hours</b>It never blocks time for you or guesses how long things take. You move the progress slider.</div>
+      <div class="cbox"><b>Bump, don't drop</b>Anything can be hidden until a date and comes back on its own.</div>
+      <div class="cbox"><b>No email reading</b>You decide what goes in. Less access, less to go wrong.</div>
+      <div class="cbox"><b>Safe deletes</b>Deletes have undo. The nightly check can't delete anything; that's enforced in code.</div>
+      <div class="cbox"><b>Always fresh</b>Briefs re-read the calendar each time, so late-night edits show up in the morning.</div>
+    </div>
+    <div class="card"><h3>Get it on your own accounts</h3>
+      <ol class="steps">
+        <li>Download <a href="${esc(ZIP)}">chief-of-staff-skill.zip</a> from <a href="${esc(CONFIG.repo)}">the GitHub repo</a>.</li>
+        <li>In Claude, go to <b>Customize → Skills</b>, tap <b>+</b>, then <b>Create skill → Upload a skill</b>, and choose the zip.</li>
+        <li>Connect the <b>Notion</b> and <b>Google Calendar</b> connectors.</li>
+        <li>In a new chat, say <b>“Set up my chief of staff.”</b> Claude creates your Notion lists, asks which calendars to use, builds your own copy of this page and schedules your two briefs.</li></ol>
+      <span class="muted">Needs a Claude plan with skills and scheduled tasks, plus free Notion and Google accounts. The optional nightly check has its own setup in the repo.</span></div>
+    <p class="muted">Built with Claude for DPI-681 by Megan.</p>
+  </div>`;
+}
+
+function render() {
+  const app = document.getElementById("app"); if (!app) return;
+  if (!S.mode) { app.innerHTML = gateHTML(); return; }
+  const active = document.activeElement && document.activeElement.id;
+  const navs = [["home", "Home"], ["briefs", "Briefs"], ["about", "About"]];
+  const body = S.view === "briefs" ? briefsView() : S.view === "about" ? aboutView() : homeView();
+  const live = S.mode === "live";
+  app.innerHTML = `
+  <div class="top"><div><h1>Chief of Staff</h1>
+    <div class="mode">${live ? `<span class="pill teal">Your accounts</span><span class="muted">${S.loading ? "Syncing…" : S.synced ? "Synced " + S.synced.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }) : ""}</span>` : `<span class="pill violet">Sample week</span>`}
+      <button class="linkbtn" data-a="switchMode">${live ? "Switch to sample" : "Use my accounts"}</button></div></div>
+    <div class="line" style="justify-content:flex-end">${live ? `<button class="btn sm" data-a="refresh">Refresh</button>` : `<button class="btn sm" data-a="resetSample">Reset sample</button>`}</div></div>
+  <nav class="nav" aria-label="Sections">${navs.map(([k, t]) => `<a href="#${k}" class="${S.view === k ? "on" : ""}" ${S.view === k ? 'aria-current="page"' : ""}>${t}</a>`).join("")}</nav>
+  ${S.err ? `<div class="err" role="alert"><span>${esc(S.err)}</span>${S.errSample ? `<div><button class="btn sm" data-a="choose" data-v="sample">Try the sample week instead</button></div>` : ""}</div>` : ""}
+  ${S.mode === "sample" && S.view !== "about" ? tourHTML() : ""}
+  ${S.mode === "sample" && S.view === "home" ? `<p class="note">You're on a made-up student's week. Nothing touches your accounts; changes stay in this browser. Dates move with today.</p>` : ""}
+  ${body}
+  ${S.undo ? `<div class="undo" role="status"><span>${esc(S.undo.text)}</span>${S.undo.undoFn ? `<button data-a="undo">Undo</button>` : ""}</div>` : ""}`;
+  if (active === "qa-in" || active === "idea-in") { const el = document.getElementById(active); if (el) { el.focus(); const n = el.value.length; try { el.setSelectionRange(n, n); } catch (e) {} } }
+}
+function route() {
+  const h = location.hash.replace("#", "");
+  S.view = ["home", "briefs", "about"].includes(h) ? h : "home";
+  if (S.view === "briefs") sawBrief();
+  render(); window.scrollTo(0, 0);
+}
+
+// ================= events =================
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-a]"); if (!b || b.tagName === "INPUT" || b.tagName === "SELECT") return;
+  const a = b.dataset.a, u = b.dataset.u, v = b.dataset.v;
+  if (a === "undo") { const f = S.undo && S.undo.undoFn; if (S.undo) clearTimeout(S.undo.timer); S.undo = null; if (f) f(); render(); return; }
+  if (a === "type" || a === "skip") return A[a](u, v);
+  if (A[a]) return u !== undefined ? A[a](u) : A[a](v);
+});
+document.addEventListener("change", (e) => {
+  const t = e.target, a = t.dataset.a;
+  if (a === "done") A.done(t.dataset.u);
+  else if (a === "pct") A.pct(t.dataset.u, t.value);
+  else if (a === "qcKind" || a === "qcBump") { S.qa.card = Object.assign(readCard(), a === "qcKind" ? { kind: t.value } : { bump: t.checked }); render(); }
+  else if (t.dataset.f === "photo" && t.files && t.files[0]) readNote("", t.files[0]);
+});
+document.addEventListener("input", (e) => { if (e.target.dataset && e.target.dataset.f === "qa") S.qa.text = e.target.value; });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" || !e.target.dataset) return;
+  if (e.target.dataset.f === "qa") { e.preventDefault(); A.qaGo(); }
+  else if (e.target.dataset.f === "idea") { e.preventDefault(); A.addIdea(); }
+  else if (e.target.dataset.a === "evOpen") { e.preventDefault(); A.evOpen(e.target.dataset.u); }
+});
+window.addEventListener("hashchange", route);
+
+// ================= start =================
+(function start() {
+  const saved = store.get("cos-mode");
+  if (saved === "sample") { S.mode = "sample"; loadSample(false); }
+  route();
+  (async () => {
+    const use = window.claude && typeof window.claude.use === "function" ? window.claude.use : null;
+    if (use) {
+      try { mcp = await window.claude.use("mcp"); } catch (e) { mcp = null; }
+      try { sampler = await window.claude.use("sample"); if (sampler && typeof sampler.limits === "function") { const l = await sampler.limits(); canImg = !!(l && l.images); } } catch (e) { sampler = null; }
+    }
+    mcpChecked = true;
+    if (saved === "live" && LINKED && mcp) chooseMode("live");
+    else render();
+  })();
+})();
+</script>
+</body>
+</html>

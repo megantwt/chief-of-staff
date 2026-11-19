@@ -1,0 +1,43 @@
+name: Nightly check
+
+on:
+  schedule:
+    # 23:15 UTC = 6:15 PM in Boston in winter, 7:15 PM in summer: always before the 8 PM brief.
+    - cron: "15 23 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (show findings, save nothing)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+      - name: Run the nightly check
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          COS_CALENDARS: ${{ secrets.COS_CALENDARS }}
+          COS_OWNER: ${{ secrets.COS_OWNER }}
+          COS_TIMEZONE: ${{ secrets.COS_TIMEZONE }}
+          COS_TASKS_DB_ID: ${{ secrets.COS_TASKS_DB_ID }}
+          COS_PROPOSALS_DB_ID: ${{ secrets.COS_PROPOSALS_DB_ID }}
+          # Manual runs default to dry run. Scheduled runs save unless the DRY_RUN variable is set to true
+          # (Settings > Secrets and variables > Actions > Variables), which is how the first week stays read-only.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || vars.DRY_RUN }}
+        run: python agent.py
