@@ -8,11 +8,11 @@ An AI chief of staff for your to-dos and calendar, built on Claude. You start ea
 - **A Home page** to quick-add ("coffee w Alex tmr 4pm", or a screenshot of a poster), with a warning if the new event clashes with something; tick things off, move or remove events, bump things for later, and approve suggested changes.
 - **An optional nightly check agent** (Python on GitHub Actions) that looks for patterns the daily view misses: projects that have stalled (paired with your next free stretch), things you keep bumping, exams with no plan, crowded weeks. It only ever suggests; you approve.
 
-Built for DPI-681 (Question 2) by Megan.
+Built for DPI-681 (Question 2) by Megan. **[Try the app →](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)**
 
 ## Try it (no setup)
 
-Open the shared app and choose **Not now: try it on a sample week**. It's the real app running on a made-up student's week, with a guided tour. Nothing touches your accounts.
+👉 **[Open the app](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)** (you'll need to be signed in to Claude) and choose **Not now: try it on a sample week**. It's the real app running on a made-up student's week, with a guided tour. Nothing touches your accounts.
 
 ## Install it on your own accounts (about 5 minutes)
 
