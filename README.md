@@ -121,3 +121,20 @@ If you change anything in `skill/`, rebuild the package from the repo root:
 ```
 cd skill && zip -r ../chief-of-staff-skill.zip chief-of-staff -x "*.DS_Store" && cd ..
 ```
+
+## Privacy
+
+This tool is built for personal use. Each person who sets it up runs their own copy with their own keys, and no data is sent to the author.
+
+**What the nightly check reads**
+- **Google Calendar:** events from the calendars you list in `COS_CALENDARS`, for the next 30 days. Access is read-only: it cannot create, change or delete events.
+- **Notion:** your Chief of Staff Tasks and Proposals databases. It can read them and add new rows to Proposals, but cannot edit or delete existing pages.
+
+**What it does with that data**
+- Sends it to the Claude API (Anthropic) to look for patterns, such as stalled projects, repeatedly bumped items and crowded weeks.
+- Saves its suggestions as new rows in your Proposals database. Nothing changes on your calendar or task list unless you approve it.
+- Does not read email and does not keep copies of your data anywhere else. GitHub Actions run logs show only counts and errors, not event or task details.
+
+**Keys:** all keys are stored as encrypted GitHub Actions secrets in your own repo and never appear in the code. To revoke access at any time, remove the app at myaccount.google.com/permissions, delete the Notion connection, or delete the GitHub secrets.
+
+**Contact:** open an issue on this repo.
