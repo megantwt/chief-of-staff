@@ -33,6 +33,15 @@ Send it as two messages.
 
 Your final response is one line, which becomes the notification. For example: "Tomorrow: 5 events, first Statistics at 9:00. 1 thing needs your OK."
 
+### Sundays: your week ahead
+On Sundays, after Message 2, send **Message 3: "Your week ahead"**: two or three short lines (busiest and most open day, deadlines and exams coming, one project with room this week), then a picture drawn with `scripts/week_svg.py` and shown inline the same way as the day calendar. Its input:
+```json
+{"days": [{"label": "Mon 23", "events": [{"start": "09:00", "end": "10:30"}], "marks": [{"kind": "deadline", "title": "Paper outline due"}]}],
+ "projects": [{"title": "Seminar paper", "pct": 35, "due": "Dec 14"}],
+ "patterns": [{"kind": "stalled", "text": "Seminar paper hasn't moved in 9 days"}]}
+```
+Seven days, Monday first. Marks come from calendars of kind deadlines (deadline) and exam (exam). Patterns come from Proposals created in the last 7 days whose Check starts with `stalled:` or `bumped:` (written by the optional nightly check); leave the list empty if there are none. If drawing fails, send the same information as a short list.
+
 ## Morning brief (about today)
 
 Read the calendars **fresh** so it reflects anything the user changed last night. Don't list what changed.

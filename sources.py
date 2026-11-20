@@ -109,6 +109,8 @@ class Notion:
                 "title": self._text(p.get("Task")), "type": self._select(p.get("Type")),
                 "due": self._date(p.get("Due")), "show_from": self._date(p.get("Show from")),
                 "progress": (p.get("Progress %") or {}).get("number"),
+                "times_bumped": (p.get("Times bumped") or {}).get("number"),
+                "last_edited": r.get("last_edited_time"),
             })
         return items
 

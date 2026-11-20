@@ -288,7 +288,7 @@ const LIVE = {
   async load() {
     const t = TODAY(), end = addDays(t, 15);
     const [tasks, props] = await Promise.all([viewRows(CONFIG.tasksView), CONFIG.proposalsView ? viewRows(CONFIG.proposalsView) : Promise.resolve([])]);
-    S.items = tasks.filter((r) => r.Status !== "Done").map((r) => ({ id: r.url, title: r.Task || "(untitled)", type: r.Type || "To-do", due: r["date:Due:start"] || null, show: r["date:Show from:start"] || null, pct: r["Progress %"] ?? null }));
+    S.items = tasks.filter((r) => r.Status !== "Done").map((r) => ({ id: r.url, title: r.Task || "(untitled)", type: r.Type || "To-do", due: r["date:Due:start"] || null, show: r["date:Show from:start"] || null, pct: r["Progress %"] ?? null, bumps: r["Times bumped"] || 0 }));
     S.props = props.filter((r) => r.Status === "Pending").map((r) => { let a = null; try { a = r.Action ? JSON.parse(r.Action) : null; } catch (e) { a = null; } return { id: r.url, title: r.Title, kind: r.Kind, detail: r.Detail, action: a, date: r["date:For date:start"] }; });
     const lists = await Promise.all(S.cals.map((c) => call("Google Calendar", "list_events", { calendarId: c.id, startTime: t + "T00:00:00", endTime: end + "T00:00:00", orderBy: "startTime", pageSize: 250 }).catch(() => ({ events: [] }))));
     const evs = [];
@@ -316,7 +316,7 @@ const SAMPLE = {
   async load() {},
   async updateItem(id, p) { const i = S.items.find((x) => x.id === id); if (!i) return;
     if ("Status" in p && p.Status === "Done") i.done = true; if ("Status" in p && p.Status === "To do") i.done = false;
-    if ("Progress %" in p) i.pct = p["Progress %"]; if ("date:Show from:start" in p) i.show = p["date:Show from:start"]; if ("Type" in p) i.type = p.Type; saveSample(); },
+    if ("Progress %" in p) i.pct = p["Progress %"]; if ("date:Show from:start" in p) i.show = p["date:Show from:start"]; if ("Type" in p) i.type = p.Type; if ("Times bumped" in p) i.bumps = p["Times bumped"]; saveSample(); },
   async createItem(p) { S.items.push({ id: nid(), title: p.Task, type: p.Type, due: p["date:Due:start"] || null, show: p["date:Show from:start"] || null, pct: null }); saveSample(); },
   async deleteItem(id) { const ix = S.items.findIndex((x) => x.id === id); if (ix >= 0) S.items.splice(ix, 1); saveSample(); },
   async setProp(id) { const ix = S.props.findIndex((x) => x.id === id); if (ix >= 0) S.props.splice(ix, 1); saveSample(); },
@@ -536,6 +536,14 @@ async function readNote(text, blob) {
   if (blob) { S.qa.note = "Reading screenshots needs Claude. Type the details instead."; render(); return; }
   S.qa.card = parse(text, S.qa.force); S.qa.queue = []; S.qa.by = "rules"; render();
 }
+function clashHTML(c) {
+  if (c.allDay || !c.date || !c.time) return "";
+  const a = hm(c.time), b = a + Math.round(Number(c.len || 1) * 60);
+  if (diff(c.date) > 14 && S.mode === "live") return "";
+  const hits = timed(c.date).filter((e) => e.a < b && a < e.b);
+  if (!hits.length) return `<span class="muted" style="color:#065F46">✓ No clashes at that time.</span>`;
+  return `<div class="note" style="margin:0;background:#FFFBEB;border-color:#FDE68A;color:#78350F">⚠️ This overlaps ${hits.map((e) => esc(e.t) + " (" + fm(e.a) + "–" + fm(e.b) + ")").join(", ")}. You can still add it, or change the time.</div>`;
+}
 function readCard() {
   const c = Object.assign({}, S.qa.card); const v = (id) => { const el = document.getElementById(id); return el ? (el.type === "checkbox" ? el.checked : el.value) : undefined; };
   ["title", "kind", "date", "time", "len", "cal", "allDay", "bump", "show"].forEach((k) => { const x = v("qc-" + k); if (x !== undefined) c[k] = x; });
@@ -607,8 +615,10 @@ const A = {
     guarded(() => api().updateItem(id, { Status: "Done" }));
     toast("Done: " + it.title, () => { it.done = false; render(); guarded(() => api().updateItem(id, { Status: "To do" })); }); },
   pct: (id, v) => { item(id).pct = Number(v); mark("progress"); render(); guarded(() => api().updateItem(id, { "Progress %": Number(v) })); },
-  bump: (id) => { const el = document.getElementById("bd-" + id); const d = el && el.value; if (!d) return; item(id).show = d; S.open = null; mark("bump");
-    guarded(() => api().updateItem(id, { "date:Show from:start": d }), "Bumped until " + short(d) + ". It's in “Bumped for later”."); },
+  bump: (id) => { const el = document.getElementById("bd-" + id); const d = el && el.value; if (!d) return; const it = item(id), n = (it.bumps || 0) + 1; it.show = d; it.bumps = n; S.open = null; mark("bump");
+    guarded(() => api().updateItem(id, { "date:Show from:start": d, "Times bumped": n }), "Bumped until " + short(d) + ". It's in “Bumped for later”."); },
+  rebump: (url, d) => { const it = item(url), later = d > (it.show || "").slice(0, 10), n = (it.bumps || 0) + (later ? 1 : 0); it.show = d; it.bumps = n; render();
+    guarded(() => api().updateItem(url, Object.assign({ "date:Show from:start": d }, later ? { "Times bumped": n } : {})), d <= TODAY() ? "Back on your list now" : "Now back " + short(d)); },
   showNow: (id) => { item(id).show = null; render(); guarded(() => api().updateItem(id, { "date:Show from:start": null })); },
   type: (id, t) => { item(id).type = t; S.open = null; render(); guarded(() => api().updateItem(id, { Type: t }), t === "Project" ? "Moved to Projects" : t === "To-do" ? "Moved to To-do" : null); },
   del: (id) => { const it = item(id); it.hidden = true; S.open = null; render();
@@ -780,6 +790,7 @@ function quickAddHTML() {
           <div class="f"><label for="qc-len">Length</label><select class="ctl" id="qc-len">${[0.5, 1, 1.5, 2, 2.5, 3, 4, 5, 6].map((h) => `<option value="${h}" ${String(h) === String(c.len) ? "selected" : ""}>${h < 1 ? "30 min" : h + (h === 1 ? " hour" : " hours")}</option>`).join("")}</select></div>
           <div class="f"><label for="qc-cal">Calendar</label><select class="ctl" id="qc-cal">${S.cals.map((x) => `<option value="${esc(x.k)}" ${x.k === c.cal ? "selected" : ""}>${esc(x.n)}</option>`).join("")}</select></div>` : ""}
       </div>
+      ${c.kind === "event" ? clashHTML(c) : ""}
       ${c.kind === "event" ? `<label class="check"><input type="checkbox" id="qc-allDay" ${c.allDay ? "checked" : ""}>All-day</label>` : ""}
       <label class="check"><input type="checkbox" id="qc-bump" ${c.bump ? "checked" : ""} data-a="qcBump"><span><b>Bump me later:</b> ${c.kind === "event" ? "add a to-do “Plan for " + esc(c.title) + "”, hidden until a date" : c.kind === "task" ? "keep it off my list until a date" : c.kind === "project" ? "keep it under ‘Starting later’ until a date" : "keep it out of Ideas until a date"}</span></label>
       ${c.bump ? `<div class="grid2"><div class="f"><label for="qc-show">Show it from</label><input class="ctl" type="date" id="qc-show" value="${esc(c.show)}"></div></div>` : ""}
@@ -838,7 +849,7 @@ function homeView() {
       </section>
       <section class="card bumped" data-tab="todo">
         <button class="btn sm" style="border:none;background:transparent;justify-content:space-between;display:flex;align-items:center;width:100%;padding:0;font-weight:600" aria-expanded="${S.bumpedOpen}" data-a="bumpedToggle"><span>${S.bumpedOpen ? "▾" : "▸"} Bumped for later (${bumps.length})</span><span style="color:#0F766E;font-weight:500">${S.bumpedOpen ? "Hide" : "Show all"}</span></button>
-        ${S.bumpedOpen ? (bumps.length ? bumps.map((i) => `<div class="row"><span class="pill ${i.type === "Project" ? "blue" : i.type === "Idea" ? "amber" : "teal"}">${esc(i.type)}</span><span class="t">${esc(i.title)}<br><span class="muted">back ${nice(i.show)}</span></span><button class="btn sm" data-a="showNow" data-u="${esc(i.id)}">Show now</button></div>`).join("") : `<div class="empty">Nothing bumped.</div>`) : ""}
+        ${S.bumpedOpen ? (bumps.length ? bumps.map((i) => `<div class="row"><span class="pill ${i.type === "Project" ? "blue" : i.type === "Idea" ? "amber" : "teal"}">${esc(i.type)}</span><span class="t">${esc(i.title)}<br><span class="muted">back ${nice(i.show)}</span></span><label class="sr" for="rb-${esc(i.id)}">Change the date for ${esc(i.title)}</label><input class="datein" type="date" id="rb-${esc(i.id)}" value="${esc(i.show.slice(0, 10))}" data-a="rebump" data-u="${esc(i.id)}" title="Change when it comes back"><button class="btn sm" data-a="showNow" data-u="${esc(i.id)}">Show now</button></div>`).join("") : `<div class="empty">Nothing bumped.</div>`) : ""}
       </section>
     </div>
   </div>`;
@@ -849,11 +860,11 @@ function aboutView() {
   return `<div class="prose">
     <div><h3>How it works</h3><p class="muted" style="font-size:13px;margin-top:4px">An AI chief of staff for your to-dos and calendar. You start each day knowing what's coming, and it never changes your calendar without your OK.</p></div>
     <div style="display:flex;flex-direction:column;gap:6px">
-      ${row("You put things in", box("b-you", "Quick add", "Type a note here. Claude reads it.") + box("b-you", "Photo or message", "Send a screenshot of a poster or email in a Claude chat.") + box("b-you", "Google Calendar", "Or just edit your calendar directly."))}
+      ${row("You put things in", box("b-you", "Quick add", "Type a note here. Claude reads it and flags clashes.") + box("b-you", "Photo or message", "Send a screenshot of a poster or email in a Claude chat.") + box("b-you", "Google Calendar", "Or just edit your calendar directly."))}
       <div class="arrow" aria-hidden="true">↓</div>
       ${row("Where it lives", box("b-store", "Google Calendar", "Events, on calendars by kind: classes, deadlines, exams, social…") + box("b-store", "Notion", "To-dos, projects, ideas, plus the bot's proposals."))}
       <div class="arrow" aria-hidden="true">↓</div>
-      ${row("Runs on its own", box("b-run", "8 pm evening brief", "Claude scheduled task, every day.") + box("b-run", "Morning brief", "Claude scheduled task; reads the calendar fresh.") + box("b-run", "Nightly check (optional)", "A small agent on GitHub Actions looks for clashes and gaps."))}
+      ${row("Runs on its own", box("b-run", "8 pm evening brief", "Every day, plus week-ahead charts on Sundays.") + box("b-run", "Morning brief", "Claude scheduled task; reads the calendar fresh.") + box("b-run", "Nightly check (optional)", "An agent on GitHub Actions spots stalled projects and things you keep bumping."))}
       <div class="arrow" aria-hidden="true">↓</div>
       ${row("Comes back to you", box("b-back", "Brief in Claude", "New chat + notification, with the day drawn to scale.") + box("b-back", "This page", "Proposals wait for Approve or Skip; one tap applies them."))}
     </div>
@@ -916,6 +927,8 @@ document.addEventListener("change", (e) => {
   const t = e.target, a = t.dataset.a;
   if (a === "done") A.done(t.dataset.u);
   else if (a === "pct") A.pct(t.dataset.u, t.value);
+  else if (a === "rebump" && t.value) A.rebump(t.dataset.u, t.value);
+  else if (["qc-date", "qc-time", "qc-len", "qc-allDay"].includes(t.id) && S.qa.card) { S.qa.card = readCard(); render(); }
   else if (a === "qcKind" || a === "qcBump") { S.qa.card = Object.assign(readCard(), a === "qcKind" ? { kind: t.value } : { bump: t.checked }); render(); }
   else if (t.dataset.f === "photo" && t.files && t.files[0]) readNote("", t.files[0]);
 });
@@ -927,6 +940,11 @@ document.addEventListener("keydown", (e) => {
   else if (e.target.dataset.a === "evOpen") { e.preventDefault(); A.evOpen(e.target.dataset.u); }
 });
 window.addEventListener("hashchange", route);
+
+// Finish a pending delete straight away if the page is hidden or closed, so leaving within the undo window doesn't cancel it.
+function flushPending() { if (S.undo && S.undo.onExpire) { clearTimeout(S.undo.timer); const f = S.undo.onExpire; S.undo = null; try { f(); } catch (e) {} } }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushPending(); });
+window.addEventListener("pagehide", flushPending);
 
 // ================= start =================
 (function start() {

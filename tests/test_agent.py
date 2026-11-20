@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import config  # noqa: E402
-from agent import Run  # noqa: E402
+from agent import Run, enrich, free_stretches  # noqa: E402
 from guardrails import Rejected, validate_finding  # noqa: E402
 
 LAW = "you@example.com"
@@ -37,7 +37,14 @@ class FakeNotion:
         self._pending = pending or []
 
     def open_items(self):
-        return [{"title": "Reply to TA", "type": "To-do", "due": "2026-11-17", "show_from": None, "progress": None}]
+        return [
+            {"title": "Reply to TA", "type": "To-do", "due": "2026-11-17", "show_from": None, "progress": None,
+             "times_bumped": None, "last_edited": "2026-11-17T15:00:00.000Z"},
+            {"title": "Seminar paper", "type": "Project", "due": "2026-12-14", "show_from": None, "progress": 35,
+             "times_bumped": 0, "last_edited": "2026-11-08T15:00:00.000Z"},
+            {"title": "Learn SQL", "type": "Project", "due": None, "show_from": "2026-11-25", "progress": 0,
+             "times_bumped": 3, "last_edited": "2026-11-16T15:00:00.000Z"},
+        ]
 
     def pending_proposals(self):
         return list(self._pending)
@@ -101,7 +108,62 @@ class GuardrailTests(unittest.TestCase):
         self.assertIsNone(f["action"])
 
 
+STALLED = {"kind": "Heads-up", "title": "Seminar paper hasn't moved in 10 days",
+           "detail": "Tomorrow 13:30 to 22:00 is free.", "check_id": "stalled:Seminar paper:2026-W47",
+           "for_date": "2026-11-19"}
+
+
+class HelperTests(unittest.TestCase):
+    def test_free_stretches_longest_first_and_ignores_free_events(self):
+        events = FakeCalendar().list_events(None, None) + [
+            {"all_day": False, "free": True, "start": "2026-11-19T09:00:00-05:00", "end": "2026-11-19T11:00:00-05:00"},
+            {"all_day": True, "free": False, "start": "2026-11-19", "end": "2026-11-20"}]
+        free = free_stretches(events, "2026-11-19")
+        self.assertEqual(free[0], {"start": "13:30", "end": "22:00"})
+        self.assertIn({"start": "08:00", "end": "12:20"}, free)
+        self.assertEqual(len(free), 2)
+
+    def test_free_stretches_skips_short_gaps(self):
+        events = [{"start": "2026-11-19T08:00:00-05:00", "end": "2026-11-19T12:00:00-05:00"},
+                  {"start": "2026-11-19T12:30:00-05:00", "end": "2026-11-19T22:00:00-05:00"}]
+        self.assertEqual(free_stretches(events, "2026-11-19"), [])
+
+    def test_enrich_adds_days_since_edit_and_bumps(self):
+        items = enrich(FakeNotion().open_items(), NOW)
+        paper = next(i for i in items if i["title"] == "Seminar paper")
+        self.assertEqual(paper["days_since_edit"], 10)
+        self.assertNotIn("last_edited", paper)
+        self.assertEqual(items[0]["times_bumped"], 0)
+        self.assertEqual(items[2]["times_bumped"], 3)
+
+
 class LoopTests(unittest.TestCase):
+    def test_pattern_run_uses_free_time_and_saves_heads_up(self):
+        model = ScriptedModel([
+            [call(1, "list_open_items", {}), call(2, "list_pending_proposals", {}),
+             call(3, "free_time", {"date": "2026-11-19"})],
+            [call(4, "save_finding", STALLED),
+             call(5, "save_finding", {"kind": "Heads-up", "title": "Block 2 hours for the paper",
+                                      "detail": "", "check_id": "stalled:x"})],
+            [{"type": "text", "text": "Saved 1 stalled-project note."}],
+        ])
+        notion = FakeNotion()
+        run = Run(model, FakeCalendar(), notion, NOW)
+        self.assertEqual(run.go(), "Saved 1 stalled-project note.")
+        self.assertEqual([f["check_id"] for f in notion.saved], ["stalled:Seminar paper:2026-W47"])
+        self.assertIn("no hours", run.rejected[0]["reason"])
+        tool_results = model.seen[1]["content"]
+        free = next(r for r in tool_results if r["tool_use_id"] == "t3")["content"]
+        self.assertIn("13:30", free)
+        items = next(r for r in tool_results if r["tool_use_id"] == "t1")["content"]
+        self.assertIn("days_since_edit", items)
+
+    def test_free_time_beyond_window_is_empty(self):
+        cal = FakeCalendar()
+        model = ScriptedModel([[call(1, "free_time", {"date": "2027-06-01"})], [{"type": "text", "text": "done"}]])
+        Run(model, cal, FakeNotion(), NOW).go()
+        self.assertEqual(cal.calls, [])
+
     def test_full_run_saves_through_guardrails(self):
         model = ScriptedModel([
             [call(1, "list_calendar_events", {"start_date": "2026-11-19", "end_date": "2026-11-19"}),

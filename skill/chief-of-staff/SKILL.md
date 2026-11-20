@@ -5,7 +5,7 @@ description: A personal chief of staff for to-dos and calendar, using Google Cal
 
 # Chief of Staff
 
-You run the user's to-dos and calendar. Events live in **Google Calendar**. To-dos, projects and ideas live in a **Notion** database. Every day the user gets an **evening brief** (8 pm) previewing tomorrow and a short **morning brief** for today. A Home page lets them quick-add, tick things off, bump things for later and approve suggested changes.
+You run the user's to-dos and calendar. Events live in **Google Calendar**. To-dos, projects and ideas live in a **Notion** database. Every day the user gets an **evening brief** (8 pm) previewing tomorrow, with a visual week-ahead section on Sundays, and a short **morning brief** for today. A Home page lets them quick-add, tick things off, bump things for later and approve suggested changes.
 
 ## Rules (always)
 
@@ -36,6 +36,7 @@ Search Notion for an existing "Chief of Staff – Tasks" database first; reuse i
 | Due | date | |
 | Show from | date | hide the item until this date |
 | Progress % | number | |
+| Times bumped | number | Home adds 1 each time you bump the item |
 | Source | select | Quick add, Chat, Evening brief |
 | Notes | text | |
 
@@ -48,6 +49,9 @@ Search Notion for an existing "Chief of Staff – Tasks" database first; reuse i
 | Detail | text | |
 | Action | text | JSON of the calendar change, see below |
 | For date | date | |
+| Check | text | a stable ID for each finding, so it isn't repeated (the nightly check fills it) |
+| Source | select | Nightly check, Evening brief |
+| Created | created time | |
 
 Then fetch each database and note:
 - the Tasks **data source ID** (from its `collection://…` URL, without the prefix);
@@ -96,16 +100,21 @@ Create two **scheduled tasks**, each starting a new chat and sending a push noti
 - **Evening brief**: every day at 8:00 pm in the user's time zone.
 - **Morning brief**: every day at 7:15 am.
 
-For each, use the prompt template in `references/scheduled-prompts.md`. Paste in the config JSON, the full matching section of `references/briefs.md`, and the full text of `scripts/cal_svg.py` and `scripts/cal_text.py`. Each run is a fresh session that may not load this skill, so the prompt has to stand on its own.
+For each, use the prompt template in `references/scheduled-prompts.md`. Paste in the config JSON, the full matching section of `references/briefs.md`, and the full text of `scripts/cal_svg.py` and `scripts/cal_text.py` (plus `scripts/week_svg.py` for the evening brief's Sunday section). Each run is a fresh session that may not load this skill, so the prompt has to stand on its own.
 
 If scheduled tasks aren't available, say so and offer to run a brief whenever the user asks ("brief me for tomorrow").
 
 ### 6. Wrap up
-Send a short summary: the Home link, the two brief times, where the Notion lists are, and three things to try. For example, quick-add "dinner Friday 7pm", send a photo of a poster, or ask "brief me for tomorrow". Mention the optional nightly check in the repo for people comfortable with GitHub.
+Send a short summary: the Home link, the two brief times, where the Notion lists are, and three things to try. For example, quick-add "dinner Friday 7pm", send a photo of a poster, or ask "brief me for tomorrow". Mention the optional nightly check for people comfortable with GitHub, and offer to prepare its settings. If they want it, give them, ready to paste as GitHub secrets (see NIGHTLY.md in the repo):
+- `COS_CALENDARS`: a JSON object of each chosen calendar's ID and name, e.g. `{"you@gmail.com": "classes", "abc@group.calendar.google.com": "deadlines"}`;
+- `COS_TASKS_DB_ID` and `COS_PROPOSALS_DB_ID`: the 32-character IDs of the two databases;
+- `COS_OWNER` (their first name) and `COS_TIMEZONE`.
+They will also need to fork the repo, make a read-only Notion integration and a read-only Google token, and add a Claude API key; NIGHTLY.md walks through it.
 
 ## Everyday use in chat
 
 - **Adding things.** For a note, photo or screenshot, work out each item: an event (with a time, or a meeting, class or meal), a to-do (has a deadline), a project (long piece of work), or an idea (someday). Show a short list with the date, time and calendar you chose. Create events only after a yes. To-dos, projects and ideas can be saved right away with Source = Chat.
+- **Clashes.** Before adding an event, check that day's calendar and mention anything it overlaps; add it anyway if the user says so.
 - **Exams and interviews.** Also add a to-do "Plan for <event>" with Show from two weeks before (tomorrow if that's passed).
 - **"Bump X until <date>"** sets Show from. **"Make X a project"** or **"make X a to-do"** changes Type.
 - **Moving or cancelling events.** Confirm the exact change first. Don't edit events the user was invited to by someone else; tell them to change those in Google Calendar.

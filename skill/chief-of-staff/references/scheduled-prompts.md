@@ -19,6 +19,10 @@ Script A, cal_svg.py (save to /tmp/cal_svg.py):
 Script B, cal_text.py (fallback; save to /tmp/cal_text.py):
 <paste scripts/cal_text.py>
 
+Sundays only, script C, week_svg.py (save to /tmp/week_svg.py):
+<paste scripts/week_svg.py>
+<paste the "Sundays: your week ahead" section of references/briefs.md>
+
 Rules: never block time or estimate hours; change nothing except marking Heads-ups Seen; send the brief exactly once, with SendUserMessage if that tool exists; your final response is the one-line notification.
 ```
 
