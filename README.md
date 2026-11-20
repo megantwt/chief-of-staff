@@ -1,18 +1,61 @@
 # Chief of Staff
 
-An AI chief of staff for your to-dos and calendar, built on Claude. You start each day knowing what's coming, and it never changes your calendar without your OK.
+An AI chief of staff that runs my calendar and my to-do list as one system, so I start each day knowing what's coming and what I realistically have room for. It never changes my calendar without my OK.
 
-- **Google Calendar** holds your events. **Notion** holds your to-dos, projects and ideas.
-- **Every evening at 8 pm** Claude starts a new chat with tomorrow's schedule drawn to scale, everything you could work on, what's coming up in the next two weeks, and anything waiting on your OK. **On Sundays** it adds *Your week ahead*: next week day by day (booked vs free time, deadlines and exams), your project progress, and patterns worth noticing.
-- **Every morning** a short brief: your first commitment, your most urgent to-do, and today's calendar, read fresh so late-night changes show up.
-- **A Home page** to quick-add ("coffee w Alex tmr 4pm", or a screenshot of a poster), with a warning if the new event clashes with something; tick things off, move or remove events, bump things for later, and approve suggested changes.
-- **An optional nightly check agent** (Python on GitHub Actions) that looks for patterns the daily view misses: projects that have stalled (paired with your next free stretch), things you keep bumping, exams with no plan, crowded weeks. It only ever suggests; you approve.
+Built with Claude for DPI-681 (Question 2) by Megan. **[Try the app →](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)**
 
-Built for DPI-681 (Question 2) by Megan. **[Try the app →](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)**
+## The problem
+
+**1. My calendar and my to-do list compete for the same hours, but they don't know about each other.**
+A calendar says where I need to be; a to-do list says what I need to get done. Both draw on the same day, so the more there is on my list, the less I should book into my calendar. But they live in separate apps. I'd accept a coffee chat, a talk and a study group, and only at 10 pm notice that the problem set is due tomorrow and there's no gap left. Neither app ever says "you have two free hours and four things due."
+
+**2. One to-do list treats everything as the same kind of task.**
+An exam in three weeks, a seminar paper due next month, "reply to the TA" and "start a podcast someday" sit in one list with the same checkbox. The list grows, everything looks equally urgent, and it becomes overwhelming. Worse, the things that need preparing weeks ahead (exams, interviews) get buried under small tasks until it's too late to prepare well. They aren't the same kind of thing, so they shouldn't be handled the same way.
+
+**3. I want to know what tomorrow looks like before it starts.**
+I plan better and feel calmer when I've seen the shape of the next day the night before (what's booked, where the free time is, what I could work on) and get a quick reminder in the morning before the first thing.
+
+## How it solves them
+
+### 1. One view of time and tasks
+- **The day drawn to scale, next to the list.** Home and both briefs show the day hour by hour, with free stretches marked in green, right beside everything I could work on. I can see at a glance whether the list fits the day.
+- **Clash warnings when I add something.** Quick add checks the calendar before I save ("This overlaps BKC Lunch Talk 12:20–13:30").
+- **Free time matched to stalled work.** The nightly check agent notices a project I haven't touched in a week and points to my next free stretch ("Seminar paper hasn't moved in 9 days. Tomorrow 14:00 to 17:00 is free.").
+- **The week at a glance.** Every Sunday the brief shows next week day by day: booked versus free time, with deadlines and exams marked on their day.
+- **Deliberately no hour estimates.** It shows the space and lets me decide what fits. It never blocks time for me or guesses how long something will take.
+
+### 2. Different kinds of tasks, handled differently
+| Kind | How it's handled |
+|---|---|
+| **Exams and interviews** | Go on the calendar (on an exams calendar), and a "Plan for …" to-do is created automatically, hidden until two weeks before. The nightly check flags any exam that still has no plan. |
+| **Projects** | Their own list, with a deadline and a progress slider that I move myself. Projects can wait under "Starting later". Flagged when they stall, or when the deadline is within 14 days. |
+| **Short to-dos** | A plain list sorted by due date, overdue in red. Tick off with undo. |
+| **Ideas** | A separate "someday" list, kept out of the daily briefs so it doesn't add noise. |
+| **Anything** | Can be **bumped** until a date: it disappears and comes back on its own. Things bumped three or more times get flagged, so nothing quietly rots. |
+
+Quick add sorts new items for me: Claude reads "stats midterm 15 dec, bump me on 5 dec" or a screenshot of a poster and fills in the type, date and calendar, which I check before saving. Any item can switch between to-do and project.
+
+### 3. Briefs that prepare me for the day
+- **Evening brief (8 pm):** a new Claude chat with a notification. Tomorrow drawn to scale, every to-do and project I could work on, what's coming in the next two weeks, anything waiting for my OK, and a short quote I can rate.
+- **Morning brief:** arrives 30 minutes before my first event (between 6:00 and 7:30): first commitment, most urgent to-do, and the day drawn fresh, so changes I made last night show up.
+- **Sunday, "Your week ahead":** next week by day, project progress, and patterns the agent noticed.
+
+## Design choices
+- **I approve every calendar change.** Saving in Quick add counts as approval; the agent can only suggest.
+- **No hours.** Progress and time estimates are mine to make, not the bot's.
+- **No email access.** I decide what goes in. Less access, less to go wrong.
+- **An agent, but a cautious one.** The nightly check decides what's worth raising, but its limits are enforced in code: a read-only calendar token, insert-only Notion access, and guardrails that refuse deletions or time blocks whatever the model says.
+
+## How it's built
+- **Google Calendar** holds events; **Notion** holds to-dos, projects, ideas and the agent's proposals.
+- **Home** is a Claude artifact that reads and writes both through Claude's connectors.
+- **Three Claude scheduled tasks:** the evening brief, the morning brief, and a silent 5:41 am task that moves the morning brief to fit the first event.
+- **The nightly check** is a Python agent on GitHub Actions using the Claude API, with tests (`tests/`).
+- **The skill** packages all of it, so anyone can install it on their own accounts.
 
 ## Try it (no setup)
 
-👉 **[Open the app](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)** (you'll need to be signed in to Claude) and choose **Not now: try it on a sample week**. It's the real app running on a made-up student's week, with a guided tour. Nothing touches your accounts.
+👉 **[Open the app](https://claude.ai/artifact/MhbJwnfFpbeNcHif4ehrSe)** (sign in to Claude if it asks) and choose **Not now: try it on a sample week**. It's the real app running on a made-up student's week, with a guided tour. Nothing touches your accounts.
 
 ## Install it on your own accounts (about 5 minutes)
 
@@ -27,7 +70,7 @@ Claude then:
 - creates two Notion databases (Tasks, Proposals), or reuses them if you already have them;
 - lists your calendars and asks which to ignore and what kind each one is (classes, deadlines, exams, social…);
 - builds your own copy of the Home page, linked to your accounts. It asks for permission the first time it uses them;
-- schedules your evening and morning briefs.
+- schedules your evening and morning briefs, plus a silent early-morning task that moves the morning brief to fit your first event.
 
 After that, just talk to it: "add dinner with Jamie Friday 7pm", "bump the reading until Monday", "brief me for tomorrow", or send a photo of a flyer.
 
@@ -41,7 +84,7 @@ For people comfortable with GitHub. Everything above works without it.
 
 Its findings show up in your evening brief under "Needs you", in Home, and in the Sunday charts.
 
-## How it stays safe
+## Safety rules at a glance
 
 | Rule | How |
 |---|---|
@@ -59,9 +102,17 @@ Its findings show up in your evening brief under "Needs you", in Home, and in th
 | `chief-of-staff-skill.zip` | The package you upload to Claude (built from `skill/`) |
 | `skill/chief-of-staff/SKILL.md` | What Claude does: setup steps, rules, daily use |
 | `skill/chief-of-staff/assets/home.html` | The Home page. Its config block is filled in during setup; left empty it runs on the sample week |
-| `skill/chief-of-staff/references/` | How the briefs are written, and the scheduled-task prompts |
+| `skill/chief-of-staff/references/` | How the briefs are written, and the scheduled-task prompt templates Claude fills in for you |
+| `prompts/` | The exact prompts behind Megan's own setup (evening brief, morning brief, morning-time setter), with private IDs replaced. See [prompts/README.md](prompts/README.md) |
 | `skill/chief-of-staff/scripts/` | Draws the to-scale day calendar for the briefs (`cal_svg.py`, `cal_text.py`) and the Sunday week-ahead picture (`week_svg.py`) |
 | `agent.py`, `sources.py`, `guardrails.py`, `config.py`, `.github/workflows/nightly.yml` | **Optional nightly check**: a small agent on GitHub Actions that spots stalled projects, repeat bumps, exams without a plan and crowded weeks, and leaves suggestions for you to approve. Tests in `tests/`. See [NIGHTLY.md](NIGHTLY.md) |
+
+## Where the prompts live
+
+Everything that tells Claude what to do is in this repo:
+- **The skill** (`skill/chief-of-staff/SKILL.md`): what Claude does in chat and how it sets everything up.
+- **The scheduled-task prompts:** templates in `skill/chief-of-staff/references/scheduled-prompts.md`, and the live versions from Megan's setup in `prompts/`. The live copies that actually run are stored in Claude's scheduled tasks; the ones here are copies with private IDs removed.
+- **The nightly check's system prompt:** `SYSTEM` in `agent.py`.
 
 ## Rebuilding the zip
 

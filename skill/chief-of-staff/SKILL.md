@@ -96,11 +96,12 @@ Use the connector names exactly as they appear in this session's tool names (und
 If this session can't publish artifacts with connector access, give the user the filled-in file and say that Home needs a Claude plan with artifact connector access. Everything else still works in chat.
 
 ### 5. Daily briefs
-Create two **scheduled tasks**, each starting a new chat and sending a push notification:
-- **Evening brief**: every day at 8:00 pm in the user's time zone.
-- **Morning brief**: every day at 7:15 am.
+Create three **scheduled tasks**:
+- **Evening brief**: every day at 8:00 pm in the user's time zone. New chat, push notification.
+- **Morning brief**: every day at 7:30 am to start with. New chat, push notification.
+- **Set morning brief time**: every day at about 5:40 am, with **no notifications**. It moves the morning brief to 30 minutes before the day's first event, never later than 7:30 and never earlier than 6:00. Create it after the morning brief, because its prompt needs the morning brief task's ID. It must be allowed to update scheduled tasks; if this session can't create a task that updates another, skip it and say the morning brief stays at 7:30.
 
-For each, use the prompt template in `references/scheduled-prompts.md`. Paste in the config JSON, the full matching section of `references/briefs.md`, and the full text of `scripts/cal_svg.py` and `scripts/cal_text.py` (plus `scripts/week_svg.py` for the evening brief's Sunday section). Each run is a fresh session that may not load this skill, so the prompt has to stand on its own.
+For the briefs, use the prompt templates in `references/scheduled-prompts.md`. Paste in the config JSON, the full matching section of `references/briefs.md`, and the full text of `scripts/cal_svg.py` and `scripts/cal_text.py` (plus `scripts/week_svg.py` for the evening brief's Sunday section). Each run is a fresh session that may not load this skill, so the prompt has to stand on its own.
 
 If scheduled tasks aren't available, say so and offer to run a brief whenever the user asks ("brief me for tomorrow").
 

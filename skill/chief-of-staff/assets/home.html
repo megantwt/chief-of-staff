@@ -262,7 +262,7 @@ function loadSample(fresh) {
 const saveSample = () => { if (S.mode === "sample" && SD) { SD.items = S.items; SD.props = S.props; SD.events = S.events; store.set(SKEY, JSON.stringify(SD)); } };
 const tour = () => (S.mode === "sample" && SD ? SD.tour : null);
 function mark(k) { const t = tour(); if (t && k) t[k] = true; saveSample(); }
-function sawBrief() { const t = tour(); if (t) { t.brief = true; if (t.task || t.event) t.again = true; saveSample(); } }
+function sawBrief() { const t = tour(); if (!t) return; if (S.brief === "pm") t.brief = true; if (S.brief === "am" && (t.task || t.event)) t.again = true; saveSample(); }
 
 // ================= live mode (your Google Calendar + Notion) =================
 function unwrap(r) {
@@ -441,14 +441,17 @@ function briefPM() {
       <div><button class="btn pri" data-a="goHome">Open Home →</button></div>
     </div>` };
 }
+// The next morning brief: tomorrow's in the sample week (it follows tonight's evening brief), and in live mode
+// today's until 7:30 am, then tomorrow's.
+function amOffset() { if (S.mode === "sample") return 1; const n = minsIn(new Date()); return n < 450 ? 0 : 1; }
 function briefAM() {
-  const t0 = dayIso(0), ev = timed(t0), first = ev[0];
+  const off = amOffset(), t0 = dayIso(off), ev = timed(t0), first = ev[0];
   const urgent = S.items.filter((i) => i.type === "To-do" && visibleOn(i, t0)).sort(byDue)[0];
   const who = owner() ? ", " + esc(owner()) : "";
-  return { time: "7:17 AM", notif: first ? `First thing: ${first.t} at ${fm(first.a)}.` : "Your calendar is clear today.", html: `
+  return { time: "7:30 AM", day: (off ? "Tomorrow, " : "Today, ") + nice(t0), notif: first ? `First thing: ${first.t} at ${fm(first.a)}.` : "Your calendar is clear today.", html: `
     <div class="msg"><p><b>Good morning${who}.</b></p>
       <p>First thing: ${first ? `<b>${esc(first.t)}</b> at ${fm(first.a)}` : "nothing booked, so the morning is yours"}.</p>
-      ${urgent ? `<p>Most urgent: <b>${esc(urgent.title)}</b>${urgent.due ? " (" + dueLbl(urgent.due, 0)[0].toLowerCase() + ")" : ""}.</p>` : ""}
+      ${urgent ? `<p>Most urgent: <b>${esc(urgent.title)}</b>${urgent.due ? " (" + (diff(urgent.due) - off < 0 ? "overdue" : diff(urgent.due) - off === 0 ? "due today" : "due " + short(urgent.due)) + ")" : ""}.</p>` : ""}
       <div class="bh">Today</div>${calSVG(t0, "Today's schedule")}</div>
     <div class="msg"><div><button class="btn pri" data-a="goHome">Open Home →</button></div></div>` };
 }
@@ -602,7 +605,7 @@ const A = {
   tourGo: (k) => {
     const later = (fn) => setTimeout(fn, 60);
     const show = (id) => later(() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); });
-    if (k === "brief" || k === "again") { S.brief = k === "again" && tour().eventDay === 0 ? "am" : "pm"; go("briefs"); return; }
+    if (k === "brief" || k === "again") { S.brief = k === "again" ? "am" : "pm"; go("briefs"); sawBrief(); render(); return; }
     if (k === "task" || k === "event") { S.qa.force = k; S.qa.card = null; go("home"); later(() => { const el = document.getElementById("qa-in"); if (el) { el.placeholder = k === "task" ? "Something you need to do, e.g. “read for Thursday's class by wed”" : "A real plan, e.g. “dinner with Jamie tomorrow 7pm”"; el.focus(); el.scrollIntoView({ block: "center" }); } }); return; }
     if (k === "approve") { setTab("today"); go("home"); show("appr"); return; }
     if (k === "bump") { setTab("todo"); const f = S.items.filter((i) => i.type === "To-do" && visibleOn(i, TODAY())).sort(byDue)[0]; if (f) S.open = f.id; go("home"); show("todos"); return; }
@@ -695,14 +698,14 @@ const STEPS = [
   ["approve", "Approve what the nightly check found", "Fix the office-hours clash or add interview prep. Nothing changes until you say so."],
   ["bump", "Bump something for later", "Open a to-do's options (the slider icon) and pick a date. It waits in “Bumped for later” and comes back on its own."],
   ["progress", "Make progress", "Tick off a to-do, or move a project's slider. You set progress; the bot never guesses it."],
-  ["again", "Open a brief again", "Your own to-do and plan are in it now, because each brief re-reads everything."]
+  ["again", "Open tomorrow's morning brief", "It arrives at 7:30 am and re-reads your calendar and lists, so what you just added is in it, even though you added it after the 8 pm brief."]
 ];
 function tourHTML() {
   const t = tour(); if (!t) return "";
   const done = STEPS.filter(([k]) => t[k]).length, all = done === STEPS.length, next = (STEPS.find(([k]) => !t[k]) || [])[0];
   const bar = `<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${STEPS.length}" aria-valuenow="${done}"><span style="width:${done / STEPS.length * 100}%"></span></div>`;
   if (!S.tourOpen) return `<div class="tour"><div class="tourhead"><b style="color:#134E4A">Guided tour · ${done} of ${STEPS.length} done</b><button class="btn sm" data-a="tourToggle">Show tour</button></div>${bar}</div>`;
-  const againHint = t.event && t.eventDay === 0 ? " Your plan is today, so check the morning brief." : t.event && t.eventDay > 1 ? " Your plan is later this week, so it'll show in that day's briefs; your to-do shows tonight." : "";
+  const againHint = t.event && t.eventDay === 0 ? " (Your plan is for today, so it's on Today in Home rather than in tomorrow's brief.)" : t.event && t.eventDay > 1 ? " (Your plan is later this week, so it'll be in that morning's brief.)" : "";
   return `<div class="tour"><div class="tourhead"><b style="color:#134E4A">Guided tour · ${done} of ${STEPS.length} done</b><button class="btn sm" data-a="tourToggle">Hide</button></div>${bar}
     <ol>${STEPS.map(([k, title, txt], i) => `<li class="${t[k] ? "ok" : ""} ${k === next ? "next" : ""}"><span class="tick ${t[k] ? "ok" : ""}">${t[k] ? "✓" : i + 1}</span>
       <span class="tt"><b>${title}</b>${k === next ? `<br><span>${txt}${k === "again" ? againHint : ""}</span>` : ""}</span>
@@ -713,15 +716,15 @@ function tourHTML() {
 function briefsView() {
   const b = S.brief === "pm" ? briefPM() : briefAM();
   return `<div class="cols"><div class="col" style="flex:1">
-    <div class="seg">${[["pm", "Evening · 8 pm"], ["am", "Morning · 7:17 am"]].map(([k, t]) => `<button class="chip ${S.brief === k ? "on" : ""}" aria-pressed="${S.brief === k}" data-a="brief" data-v="${k}">${t}</button>`).join("")}</div>
+    <div class="seg">${[["pm", "Evening · 8 pm"], ["am", "Morning · 7:30 am"]].map(([k, t]) => `<button class="chip ${S.brief === k ? "on" : ""}" aria-pressed="${S.brief === k}" data-a="brief" data-v="${k}">${t}</button>`).join("")}</div>
     <div class="briefwrap">
       <div class="notif"><span class="app" aria-hidden="true">✳</span><div><b>Claude</b> <span class="muted">· ${b.time}</span><br>${esc(b.notif)}</div></div>
-      <div class="chat"><div class="chathead"><span>${S.brief === "pm" ? "Evening brief" : "Morning brief"} · new chat</span><span>${b.time}</span></div>${b.html}</div>
+      <div class="chat"><div class="chathead"><span>${S.brief === "pm" ? "Evening brief · tonight" : "Morning brief · " + b.day}</span><span>${b.time}</span></div>${b.html}</div>
     </div></div>
     <div class="col" style="flex:0 1 380px"><div class="card"><h2>About the briefs</h2>
       <p style="margin:0;font-size:13px">Every day the Chief of Staff starts a new Claude chat and sends a notification. ${S.brief === "pm"
         ? "<b>The 8 pm brief</b> previews tomorrow: the schedule drawn to scale (free time in green, clashes in amber), everything you could work on, what's coming up, what needs your OK, and a quote you can rate."
-        : "<b>The morning brief</b> is short: your first commitment, the most urgent to-do and today's calendar. It reads the calendar fresh, so changes you make after the 8 pm brief show up."}</p>
+        : "<b>The morning brief</b> is short: your first commitment, the most urgent to-do and today's calendar. It arrives at 7:30 am and reads the calendar fresh, so changes you make after the 8 pm brief show up."}</p>
       <p style="margin:0;font-size:13px">This is a preview built from ${S.mode === "live" ? "your calendar and Notion right now" : "the sample week"}. ${S.mode === "live" ? "The real ones arrive as Claude chats on schedule." : "Change something in Home and it updates here too."}</p></div></div></div>`;
 }
 function calHTML(off) {
@@ -858,7 +861,13 @@ function aboutView() {
   const box = (cls, b, t) => `<div class="box ${cls}"><b>${b}</b>${t}</div>`;
   const row = (lbl, boxes) => `<div class="flowrow"><div class="lbl">${lbl}</div><div class="boxes">${boxes}</div></div>`;
   return `<div class="prose">
-    <div><h3>How it works</h3><p class="muted" style="font-size:13px;margin-top:4px">An AI chief of staff for your to-dos and calendar. You start each day knowing what's coming, and it never changes your calendar without your OK.</p></div>
+    <div><h3>Why I built it</h3><p class="muted" style="font-size:13px;margin-top:4px">An AI chief of staff that runs the calendar and the to-do list as one system.</p></div>
+    <div class="choices">
+      <div class="cbox"><b>Calendar and to-dos compete for the same hours</b>The more there is on my list, the less I should book. But they live in separate apps, so I'd fill the day and find out at 10 pm there's no time left for what's due. Here the day is drawn to scale beside the list, Quick add warns about clashes, and stalled projects get matched to free time.</div>
+      <div class="cbox"><b>One to-do list treats everything the same</b>Exams, interviews, projects, quick tasks and someday ideas aren't the same, and one long list buries what needs preparing weeks ahead. Here exams get a "Plan for…" to-do two weeks out, projects get progress and deadlines, ideas stay out of the way, and anything can be bumped until it matters.</div>
+      <div class="cbox"><b>I want to see tomorrow before it starts</b>An 8 pm brief shows tomorrow's shape and what I could work on; a morning brief arrives 30 minutes before my first event; on Sundays, the week ahead.</div>
+    </div>
+    <div><h3>How it works</h3></div>
     <div style="display:flex;flex-direction:column;gap:6px">
       ${row("You put things in", box("b-you", "Quick add", "Type a note here. Claude reads it and flags clashes.") + box("b-you", "Photo or message", "Send a screenshot of a poster or email in a Claude chat.") + box("b-you", "Google Calendar", "Or just edit your calendar directly."))}
       <div class="arrow" aria-hidden="true">↓</div>
