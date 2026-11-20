@@ -24,8 +24,8 @@ _PLACEHOLDER_CALENDARS = {
 CALENDARS = json.loads(os.environ["COS_CALENDARS"]) if os.environ.get("COS_CALENDARS") else _PLACEHOLDER_CALENDARS
 
 # Notion databases (IDs only; access is granted by sharing them with the integration).
-TASKS_DB_ID = (os.environ.get("COS_TASKS_DB_ID") or "your-tasks-database-id")
-PROPOSALS_DB_ID = (os.environ.get("COS_PROPOSALS_DB_ID") or "your-proposals-database-id")
+TASKS_DB_ID = ((os.environ.get("COS_TASKS_DB_ID") or "").strip() or "your-tasks-database-id")
+PROPOSALS_DB_ID = ((os.environ.get("COS_PROPOSALS_DB_ID") or "").strip() or "your-proposals-database-id")
 
 # Claude model and limits.
 MODEL = "claude-sonnet-5-5"

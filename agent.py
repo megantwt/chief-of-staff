@@ -205,7 +205,8 @@ class Run:
 
 def main():
     from sources import GoogleCalendar, Notion
-    env = os.environ
+    # Strip stray spaces/newlines that sneak in when secrets are pasted into GitHub.
+    env = {k: v.strip() for k, v in os.environ.items()}
     missing = [k for k in ("ANTHROPIC_API_KEY", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET",
                            "GOOGLE_REFRESH_TOKEN", "NOTION_TOKEN") if not env.get(k)]
     if missing:
