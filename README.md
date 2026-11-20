@@ -133,7 +133,8 @@ This tool is built for personal use. Each person who sets it up runs their own c
 **What it does with that data**
 - Sends it to the Claude API (Anthropic) to look for patterns, such as stalled projects, repeatedly bumped items and crowded weeks.
 - Saves its suggestions as new rows in your Proposals database. Nothing changes on your calendar or task list unless you approve it.
-- Does not read email and does not keep copies of your data anywhere else. GitHub Actions run logs show only counts and errors, not event or task details.
+- Does not read email and does not keep copies of your data anywhere else.
+- Each run's GitHub Actions log shows a short summary and the titles of the suggestions it saved. Logs are visible to anyone who can see the repo, so keep your copy private if those titles might be personal.
 
 **Keys:** all keys are stored as encrypted GitHub Actions secrets in your own repo and never appear in the code. To revoke access at any time, remove the app at myaccount.google.com/permissions, delete the Notion connection, or delete the GitHub secrets.
 
